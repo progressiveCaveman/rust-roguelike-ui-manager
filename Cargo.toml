@@ -1,0 +1,22 @@
+[package]
+name = "view-switcher"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num_enum = "0.5.1"
+rltk = { version = "0.8.7", features = ["serde"] }
+serde = { version = "1.0.125", features = ["derive"] }
+serde_json = "1.0.64"
+rand = "0.8.5"
+lazy_static = "1.4.0"
+shipyard = "0.6.2"
+env_logger = "0.10"
+error-iter = "0.4"
+log = "0.4"
+pixels = "0.13"
+winit = "0.28"
+winit_input_helper = "0.14"
+image = "0.24"
