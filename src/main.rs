@@ -3,7 +3,7 @@ use error_iter::ErrorIter as _;
 use log::error;
 use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
-use rltk::Point;
+use rltk::{Point, string_to_cp437};
 use screen::Screen;
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
@@ -63,23 +63,22 @@ impl World {
         // let sprite = &self.assets.cp437[(self.count / 30 % 255) as usize];
         // blit(frame, &Point{ x:0, y:0 }, sprite);
 
-        for x in 0..16 {
-            for y in 0..16 {
-                let idx = x+y * 16;
-                let sprite = &self.assets.cp437[idx];
-                blit(frame, &Point{ x:(x*8) as i32, y:(y*8) as i32 }, sprite);
+        // for x in 0..16 {
+        //     for y in 0..16 {
+        //         let idx = x+y * 16;
+        //         let sprite = &self.assets.cp437[idx];
+        //         blit(frame, &Point{ x:(x*8) as i32, y:(y*8) as i32 }, sprite);
 
-            }
+        //     }
+        // }
+
+        let str = "Hello world!";
+        let chars = string_to_cp437(str);
+
+        for (idx, ch) in chars.iter().enumerate() {
+            let sprite = &self.assets.cp437[*ch as usize];
+            blit(frame, &Point{ x:(WIDTH as usize*1/3 + idx * 8) as i32, y:(HEIGHT/2) as i32 }, sprite);
         }
-        
-
-
-        //////////////
-        // Left off here. We should be reading cp437 from the file, creating a tilemap, and rendering a random tile in the center
-        // Due to rendering all black, suspicion is that it's reading poorly, since that's the roll-your-own portion of this change
-
-
-
     }
 }
 

@@ -1,16 +1,6 @@
-// use crate::loader::Assets;
-use crate::{HEIGHT, WIDTH};
-// use alloc::rc::Rc;
-// use alloc::vec::Vec;
-use rltk::Point;
-use core::cmp::min;
 use core::time::Duration;
 use std::rc::Rc;
 
-use super::Assets;
-// use line_drawing::Bresenham;
-
-// This is the type stored in the `Assets` hash map
 pub type CachedSprite = (usize, usize, Rc<[u8]>);
 
 /// Sprites can be drawn and procedurally generated.
