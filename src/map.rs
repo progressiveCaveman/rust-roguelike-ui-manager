@@ -59,45 +59,7 @@ impl Map {
             return false;
         }
         return true;
-        // let idx = self.xy_idx(x, y);
-        // !self.blocked[idx]
     }
-
-    // pub fn distance(&self, vpos: &View<Position>, f: Target, t: Target) -> f32 {
-    //     let idx1 = match f {
-    //         Target::LOCATION(l) => vec![self.xy_idx(l.x, l.y)],
-    //         Target::ENTITY(e) => {
-    //             if let Ok(p) = vpos.get(e) {
-    //                 p.idxes(self)
-    //             } else {
-    //                 vec![0]
-    //             }
-    //         }
-    //     };
-
-    //     let idx2 = match t {
-    //         Target::LOCATION(l) => vec![self.xy_idx(l.x, l.y)],
-    //         Target::ENTITY(e) => {
-    //             if let Ok(p) = vpos.get(e) {
-    //                 p.idxes(self)
-    //             } else {
-    //                 vec![0]
-    //             }
-    //         }
-    //     };
-
-    //     let mut min = f32::MAX;
-    //     for i1 in idx1.iter() {
-    //         for i2 in idx2.iter() {
-    //             let dist = self.get_pathing_distance(*i1, *i2);
-    //             if dist < min {
-    //                 min = dist;
-    //             }
-    //         }
-    //     }
-
-    //     min
-    // }
 }
 
 impl Algorithm2D for Map {

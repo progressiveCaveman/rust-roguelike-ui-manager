@@ -1,9 +1,9 @@
-use cp437::{Assets, blit};
+use cp437::Assets;
 use error_iter::ErrorIter as _;
 use log::error;
 use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
-use rltk::{Point, string_to_cp437};
+use rltk::Point;
 use screen::Screen;
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
@@ -22,12 +22,10 @@ pub mod cp437;
 const WIDTH: i32 = 320;
 const HEIGHT: i32 = 320;
 
-
 struct World {
     pub map: Map,
     pub screen: Screen,
     pub assets: Assets,
-    pub count: i32
 }
 
 impl World {
@@ -36,7 +34,6 @@ impl World {
             map: Map::new(map::TileType::Water, (WIDTH, HEIGHT)),
             screen: Screen::new((WIDTH, HEIGHT), (0, 0)),
             assets: Assets::new(),
-            count: 0
         }
     }
 
@@ -55,10 +52,11 @@ impl World {
 
     /// Draw the `World` state to the frame buffer.
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
-    fn draw(&mut self, frame: &mut [u8]) {
+    fn draw(&self, frame: &mut [u8]) {
         self.screen.draw(frame, &self.map);
 
-        self.count += 1;
+        self.screen.draw_box(&self.assets, frame, Point { x: WIDTH * 1/3 - 8, y: HEIGHT/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
+        self.screen.print_string(&self.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });
 
         // let sprite = &self.assets.cp437[(self.count / 30 % 255) as usize];
         // blit(frame, &Point{ x:0, y:0 }, sprite);
@@ -72,13 +70,14 @@ impl World {
         //     }
         // }
 
-        let str = "Hello world!";
-        let chars = string_to_cp437(str);
+        // let str = "Hello world!";
+        // let chars = string_to_cp437(str);
 
-        for (idx, ch) in chars.iter().enumerate() {
-            let sprite = &self.assets.cp437[*ch as usize];
-            blit(frame, &Point{ x:(WIDTH as usize*1/3 + idx * 8) as i32, y:(HEIGHT/2) as i32 }, sprite);
-        }
+        // for (idx, ch) in chars.iter().enumerate() {
+        //     let sprite = &self.assets.cp437[*ch as usize];
+        //     blit(frame, &Point{ x:(WIDTH as usize*1/3 + idx * 8) as i32, y:(HEIGHT/2) as i32 }, sprite);
+        // }
+        
     }
 }
 

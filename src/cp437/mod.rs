@@ -6,15 +6,14 @@ use crate::{WIDTH, HEIGHT};
 
 use self::sprites::{Sprite, Drawable}; // to allow calling .pixels()
 
-mod converter;
-mod sprites;
+pub mod converter;
+pub mod sprites;
 
 const GLYPH_SIZE: usize = 8;
 const GLYPHS_PER_ROW: usize = 16;
 
 pub struct Assets {
     pub cp437: Vec<Sprite>, 
-    pub sheet: Sprite
 }
 
 impl Assets{
@@ -28,43 +27,23 @@ impl Assets{
         };
 
         let mut cp: Vec<Sprite> = vec![empty_glyph; 256];
-        let mut sheet = Sprite {
-            width: 128,
-            height: 128,
-            pixels: vec![0; 65536],
-        };
 
-        let mut pcount = 0;
         for pixel in img.pixels() {
-            pcount += 1;
-            dbg!(pixel);
-
             let x: usize = pixel.0 as usize;
             let y: usize = pixel.1 as usize;
-            let idx = (x + y * 128) * 4;
             
             let glyph_num = x / GLYPH_SIZE + (GLYPHS_PER_ROW * (y / GLYPH_SIZE));
             let xlocal = x % GLYPH_SIZE;
             let ylocal = y % GLYPH_SIZE;
             let idxlocal = (xlocal + ylocal * GLYPH_SIZE) * 4;
-
-            dbg!(idx);
-            dbg!(glyph_num);
-            dbg!(xlocal);
-            dbg!(ylocal);
-            dbg!(idxlocal);
     
             for i in 0..4 {
-                sheet.pixels[idx+i] = pixel.2[i];
                 cp[glyph_num].pixels[idxlocal + i] = pixel.2[i];
             }
         }
 
-        dbg!(pcount);
-
         Assets {
             cp437: cp,
-            sheet,
         }
     }
 }
