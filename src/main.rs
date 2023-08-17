@@ -3,8 +3,8 @@ use error_iter::ErrorIter as _;
 use log::error;
 use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
-use rltk::Point;
-use screen::Screen;
+use rltk::RandomNumberGenerator;
+use screen::{Screen, ScreenMode};
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
@@ -22,10 +22,12 @@ pub mod cp437;
 const WIDTH: i32 = 320;
 const HEIGHT: i32 = 320;
 
-struct World {
+pub struct World {
     pub map: Map,
     pub screen: Screen,
     pub assets: Assets,
+    pub glyph_size: i32,
+    pub tick: i32
 }
 
 impl World {
@@ -34,55 +36,42 @@ impl World {
             map: Map::new(map::TileType::Water, (WIDTH, HEIGHT)),
             screen: Screen::new((WIDTH, HEIGHT), (0, 0)),
             assets: Assets::new(),
+            glyph_size: 8,
+            tick: 0,
         }
     }
 
     /// Update the `World` internal state
     fn update(&mut self) {
-        // if self.box_x <= 0 || self.box_x + BOX_SIZE > WIDTH as i16 {
-        //     self.velocity_x *= -1;
-        // }
-        // if self.box_y <= 0 || self.box_y + BOX_SIZE > HEIGHT as i16 {
-        //     self.velocity_y *= -1;
-        // }
+        self.tick += 1;
+        if self.tick % 100 == 0 {
+            dbg!(1);
+            let mut rng = RandomNumberGenerator::new();
 
-        // self.box_x += self.velocity_x;
-        // self.box_y += self.velocity_y;
+            let x = rng.roll_dice(1, self.map.size.0);
+            let y = rng.roll_dice(1, self.map.size.1);
+
+            self.screen.pos = (x, y);
+        }
     }
 
     /// Draw the `World` state to the frame buffer.
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8]) {
-        self.screen.draw(frame, &self.map);
+        // clear screen
+        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+            let rgba = [0x00, 0x00, 0x00, 0x00];
+            pixel.copy_from_slice(&rgba);
+        }
 
-        self.screen.draw_box(&self.assets, frame, Point { x: WIDTH * 1/3 - 8, y: HEIGHT/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
-        self.screen.print_string(&self.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });
-
-        // let sprite = &self.assets.cp437[(self.count / 30 % 255) as usize];
-        // blit(frame, &Point{ x:0, y:0 }, sprite);
-
-        // for x in 0..16 {
-        //     for y in 0..16 {
-        //         let idx = x+y * 16;
-        //         let sprite = &self.assets.cp437[idx];
-        //         blit(frame, &Point{ x:(x*8) as i32, y:(y*8) as i32 }, sprite);
-
-        //     }
-        // }
-
-        // let str = "Hello world!";
-        // let chars = string_to_cp437(str);
-
-        // for (idx, ch) in chars.iter().enumerate() {
-        //     let sprite = &self.assets.cp437[*ch as usize];
-        //     blit(frame, &Point{ x:(WIDTH as usize*1/3 + idx * 8) as i32, y:(HEIGHT/2) as i32 }, sprite);
-        // }
-        
+        self.screen.draw(frame, &self);        
     }
 }
 
 fn main() -> Result<(), Error> {
     env_logger::init();
+
+    // create the window
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
     let window = {
@@ -95,6 +84,7 @@ fn main() -> Result<(), Error> {
             .unwrap()
     };
 
+    // init pixels frame buffer with window
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
@@ -103,8 +93,9 @@ fn main() -> Result<(), Error> {
 
     // Generate a world map
     let mut world = World::new();
-    // basic_fill(&mut world.map);
+    basic_fill(&mut world.map);
 
+    // main event loop
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
@@ -122,6 +113,14 @@ fn main() -> Result<(), Error> {
             if input.key_pressed(VirtualKeyCode::Escape) || input.close_requested() {
                 *control_flow = ControlFlow::Exit;
                 return;
+            }
+
+            if input.key_pressed(VirtualKeyCode::V) {
+                world.screen.mode = match world.screen.mode {
+                    ScreenMode::ScreenTypeWorldView => ScreenMode::ScreenTypeLocalView,
+                    ScreenMode::ScreenTypeLocalView => ScreenMode::ScreenTypeWorldView,
+                    _ => ScreenMode::ScreenTypeLocalView,
+                }
             }
 
             // Resize the window

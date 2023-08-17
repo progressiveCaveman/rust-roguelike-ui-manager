@@ -60,6 +60,15 @@ impl Map {
         }
         return true;
     }
+
+    pub fn get_glyph(&self, p: Point) -> char {
+        match self.tiles[self.point_idx(p)] {
+            TileType::Water => '~',
+            TileType::Sand => ' ',
+            TileType::Dirt => '.',
+            TileType::Stone => '#',
+        }
+    }
 }
 
 impl Algorithm2D for Map {

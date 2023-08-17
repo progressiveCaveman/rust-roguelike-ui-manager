@@ -17,11 +17,58 @@ Representing the screen flow
 One file is a state machine for the screen flow
 Implementation is broken off into different file Eventually
 
+Representing menu
+Message
+[Options]
+how to pass control flow?
+
+Screen always has an active menu
+No mouse interaction to start
+
+
+Initial use cases:
+Main menu
+inventory screen
+item label
+
+
+Targeting is a special function of a screen?
+
+
+console types:
+Main menu
+Any submenus
+local map
+world map
+log
+stats
+inventory
+ais
+overlays
+label
+
+
+
+pub struct Console {
+    pub size: (i32, i32),
+    pub pos: (i32, i32),
+    pub children: Vec<Console>,
+    pub hidden: bool,
+    //fns: destroy (with children)
+}
+
+trait Renderable {
+    fn render();
+}
+
+
 */
+
+use std::cmp;
 
 use rltk::Point;
 
-use crate::{WIDTH, map::{Map, self}, cp437::{converter::{string_to_cp437, to_cp437, FontCharType}, Assets, blit, sprites::Drawable}, HEIGHT};
+use crate::{WIDTH, map::{self}, cp437::{converter::{string_to_cp437, to_cp437, FontCharType}, Assets, blit, sprites::Drawable}, HEIGHT, World};
 
 pub enum ScreenMode {
     ScreenTypeMainMenu,
@@ -49,13 +96,30 @@ impl Screen {
         }
     }
 
-    pub fn draw(&self, frame: &mut [u8], map: &Map){
+    pub fn draw(&self, frame: &mut [u8], world: &World){
+        let map = &world.map;
+        let screen = &world.screen;
+        let gsize = world.glyph_size;
+
         match self.mode {
             ScreenMode::ScreenTypeMainMenu => {
-
+                screen.draw_box(&world.assets, frame, Point { x: WIDTH * 1/3 - 8, y: HEIGHT/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
+                screen.print_string(&world.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });        
             },
             ScreenMode::ScreenTypeLocalView => {
+                let width = cmp::min(self.size.0 / gsize, map.size.0 / gsize);
+                let height = cmp::min(self.size.1 / gsize, map.size.1 / gsize);
 
+                for x in 0 .. width {
+                    for y in 0 .. height {
+                        let xm = x + self.pos.0;
+                        let ym = y + self.pos.1;
+                        if map.in_bounds((xm, ym)) {
+                            let p = Point { x: xm, y: ym };
+                            screen.print_char(&world.assets, frame, map.get_glyph(p), Point { x: x * gsize, y: y * gsize });
+                        }
+                    }
+                }
             },
             ScreenMode::ScreenTypeWorldView => {
                 for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
