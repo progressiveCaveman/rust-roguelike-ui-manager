@@ -3,7 +3,7 @@ use error_iter::ErrorIter as _;
 use log::error;
 use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
-use rltk::RandomNumberGenerator;
+use rltk::{RandomNumberGenerator, Point};
 use screen::{Screen, ScreenMode};
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
@@ -16,18 +16,23 @@ pub mod map;
 pub mod screen;
 pub mod worldgen;
 pub mod cp437;
+pub mod palette;
 
-// const WIDTH: i32 = 1280;
-// const HEIGHT: i32 = 960;
-const WIDTH: i32 = 320;
-const HEIGHT: i32 = 320;
+const SCALE: i32 = 2;
+const WIDTH: i32 = 640 * SCALE;
+const HEIGHT: i32 = 480 * SCALE;
+// const WIDTH: i32 = 320;
+// const HEIGHT: i32 = 320;
+
+type Image = (Vec<[u8; 4]>, (usize, usize));
 
 pub struct World {
     pub map: Map,
     pub screen: Screen,
     pub assets: Assets,
     pub glyph_size: i32,
-    pub tick: i32
+    pub tick: i32,
+    pub image: Image
 }
 
 impl World {
@@ -38,6 +43,7 @@ impl World {
             assets: Assets::new(),
             glyph_size: 8,
             tick: 0,
+            image: (Vec::new(), (0, 0)),
         }
     }
 
@@ -51,7 +57,7 @@ impl World {
             let x = rng.roll_dice(1, self.map.size.0);
             let y = rng.roll_dice(1, self.map.size.1);
 
-            self.screen.pos = (x, y);
+            // self.screen.pos = (x, y);
         }
     }
 
@@ -59,12 +65,13 @@ impl World {
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8]) {
         // clear screen
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+        for (_, pixel) in frame.chunks_exact_mut(4).enumerate() {
             let rgba = [0x00, 0x00, 0x00, 0x00];
             pixel.copy_from_slice(&rgba);
         }
 
-        self.screen.draw(frame, &self);        
+        // self.screen.draw(frame, &self);
+        self.screen.draw_image(&self.image, frame, Point{ x: 0, y: 0 })
     }
 }
 
@@ -94,6 +101,10 @@ fn main() -> Result<(), Error> {
     // Generate a world map
     let mut world = World::new();
     basic_fill(&mut world.map);
+    world.screen.setup_consoles();
+
+    // Generate a texture
+    world.image = worldgen::world::basic();
 
     // main event loop
     event_loop.run(move |event, _, control_flow| {
@@ -115,6 +126,9 @@ fn main() -> Result<(), Error> {
                 return;
             }
 
+            // Key events
+
+            // V
             if input.key_pressed(VirtualKeyCode::V) {
                 world.screen.mode = match world.screen.mode {
                     ScreenMode::ScreenTypeWorldView => ScreenMode::ScreenTypeLocalView,

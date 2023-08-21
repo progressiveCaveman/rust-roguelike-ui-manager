@@ -1,6 +1,8 @@
+pub mod world;
+
 use std::vec;
 
-use rand::{Rng, seq::SliceRandom};
+use rand::{Rng, seq::SliceRandom, rngs::StdRng, SeedableRng};
 use rltk::Point;
 
 use crate::map::{TileType, Map};
@@ -22,13 +24,13 @@ pub fn basic_fill(map: &mut Map) {
 }
 
 fn fill_recursive(map: &mut Map, depth: i32) {
-    if depth > 200 {
+    if depth > 100 {
         return;
     }
 
     let mut new: Vec<TileType> = vec![TileType::Water; map.tiles.len()];
     let mut water = 0;
-    let rng = &mut rand::thread_rng();
+    let mut rng = StdRng::from_entropy();
 
     for index in 0..map.tiles.len() {
         let tile = map.tiles[index];
@@ -38,7 +40,7 @@ fn fill_recursive(map: &mut Map, depth: i32) {
             water += 1;
 
             let mut neighbors = get_neighbors(map.idx_point(index));
-            neighbors.shuffle(rng);
+            neighbors.shuffle(&mut rng);
 
             for p in neighbors.iter() {
                 if map.in_bounds((p.x.try_into().unwrap(), p.y.try_into().unwrap())) {

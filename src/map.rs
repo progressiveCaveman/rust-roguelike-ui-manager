@@ -78,13 +78,13 @@ impl Algorithm2D for Map {
 }
 
 impl BaseMap for Map {
-    fn is_opaque(&self, idx: usize) -> bool {
-        false
-        // self.tiles[idx] == TileType::Wall
-        //     || self.tiles[idx] == TileType::Wheat
-        //     || self.tiles[idx] == TileType::WoodWall
-        //     || self.tiles[idx] == TileType::WoodDoor // TODO make fire block too?
-    }
+    // fn is_opaque(&self, idx: usize) -> bool {
+    //     false
+    //     // self.tiles[idx] == TileType::Wall
+    //     //     || self.tiles[idx] == TileType::Wheat
+    //     //     || self.tiles[idx] == TileType::WoodWall
+    //     //     || self.tiles[idx] == TileType::WoodDoor // TODO make fire block too?
+    // }
 
     fn get_pathing_distance(&self, idx1: usize, idx2: usize) -> f32 {
         let w = self.size.0 as usize;
