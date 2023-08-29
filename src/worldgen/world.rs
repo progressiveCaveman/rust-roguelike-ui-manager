@@ -41,7 +41,7 @@ That sounds like a good approach. Might also work for towns and cities perhaps t
 */
 use noise::{utils::*, *};
 
-use crate::{Image, palette::*};
+use crate::Image;
 
 pub fn generate_wood() -> Image {
     // Base wood texture. Uses concentric cylinders aligned on the z-axis, like a log.
@@ -196,13 +196,14 @@ pub fn basic() -> Image {
 
     // Create a jade palette.
     let land_gradient = ColorGradient::new()
-        .clear_gradient()
-        .add_gradient_point(-1.000, COLOR_DARK_BLUE)
-        .add_gradient_point(-0.25, COLOR_DARKER_BLUE)
-        .add_gradient_point(-0.25, COLOR_DARKER_GREEN)
-        .add_gradient_point(0.0, COLOR_DARKEST_GREEN)
-        .add_gradient_point(0.0, COLOR_LIGHT_GREY)
-        .add_gradient_point(0.5, COLOR_GREY);
+        .build_terrain_gradient();
+        // .clear_gradient()
+        // .add_gradient_point(-1.000, COLOR_DARK_BLUE)
+        // .add_gradient_point(-0.25, COLOR_DARKER_BLUE)
+        // .add_gradient_point(-0.25, COLOR_DARKER_GREEN)
+        // .add_gradient_point(0.0, COLOR_DARKEST_GREEN)
+        // .add_gradient_point(0.0, COLOR_LIGHT_GREY)
+        // .add_gradient_point(0.5, COLOR_GREY);
 
     let mut renderer = ImageRenderer::new().set_gradient(land_gradient);
 

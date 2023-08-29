@@ -3,8 +3,8 @@ use error_iter::ErrorIter as _;
 use log::error;
 use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
-use rltk::{RandomNumberGenerator, Point};
-use screen::{Screen, ScreenMode};
+use screen::console::ConsoleMode;
+use screen::Screen;
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
@@ -51,11 +51,10 @@ impl World {
     fn update(&mut self) {
         self.tick += 1;
         if self.tick % 100 == 0 {
-            dbg!(1);
-            let mut rng = RandomNumberGenerator::new();
+            // let mut rng = RandomNumberGenerator::new();
 
-            let x = rng.roll_dice(1, self.map.size.0);
-            let y = rng.roll_dice(1, self.map.size.1);
+            // let x = rng.roll_dice(1, self.map.size.0);
+            // let y = rng.roll_dice(1, self.map.size.1);
 
             // self.screen.pos = (x, y);
         }
@@ -70,8 +69,8 @@ impl World {
             pixel.copy_from_slice(&rgba);
         }
 
-        // self.screen.draw(frame, &self);
-        self.screen.draw_image(&self.image, frame, Point{ x: 0, y: 0 })
+        self.screen.draw(frame, &self);
+        // self.screen.draw_image(&self.image, frame, Point{ x: 0, y: 0 })
     }
 }
 
@@ -104,7 +103,7 @@ fn main() -> Result<(), Error> {
     world.screen.setup_consoles();
 
     // Generate a texture
-    world.image = worldgen::world::basic();
+    // world.image = worldgen::world::basic();
 
     // main event loop
     event_loop.run(move |event, _, control_flow| {
@@ -130,10 +129,11 @@ fn main() -> Result<(), Error> {
 
             // V
             if input.key_pressed(VirtualKeyCode::V) {
-                world.screen.mode = match world.screen.mode {
-                    ScreenMode::ScreenTypeWorldView => ScreenMode::ScreenTypeLocalView,
-                    ScreenMode::ScreenTypeLocalView => ScreenMode::ScreenTypeWorldView,
-                    _ => ScreenMode::ScreenTypeLocalView,
+                world.screen.consoles[1].mode = match world.screen.consoles[1].mode {
+                    ConsoleMode::MainMenu => ConsoleMode::WorldMap,
+                    ConsoleMode::LocalMap => ConsoleMode::WorldMap,
+                    ConsoleMode::WorldMap => ConsoleMode::LocalMap,
+                    ConsoleMode::Log => ConsoleMode::Log,
                 }
             }
 

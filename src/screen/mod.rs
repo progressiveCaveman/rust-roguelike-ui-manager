@@ -52,6 +52,14 @@ impl Screen {
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
     }
 
+    // pub fn main_window(&self) -> &Console {
+    //     &self.consoles[1]
+    // }
+
+    // pub fn log_window(&self) -> &Console {
+    //     &self.consoles[0]
+    // }
+
     pub fn draw(&self, frame: &mut [u8], world: &World){
         for c in self.consoles.iter() {
             c.render(frame, world);

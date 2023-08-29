@@ -52,6 +52,7 @@ label
 use rltk::Point;
 use crate::{World, WIDTH, map, HEIGHT};
 
+#[derive(Debug)]
 pub enum ConsoleMode {
     MainMenu,
     LocalMap,
@@ -59,6 +60,7 @@ pub enum ConsoleMode {
     Log
 }
 
+#[derive(Debug)]
 pub struct Console {
     pub size: (i32, i32),
     pub pos: (i32, i32),
@@ -86,7 +88,9 @@ impl Console {
         let screen = &world.screen;
         let gsize = world.glyph_size;
 
-        match self.mode {
+        // dbg!(&self.mode);
+
+        match &self.mode {
             ConsoleMode::MainMenu => {
 
             },
