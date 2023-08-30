@@ -3,7 +3,7 @@ use image::GenericImageView;
 
 use self::sprites::Sprite;
 
-pub mod converter;
+pub mod cp437_converter;
 pub mod sprites;
 
 const GLYPH_SIZE: usize = 8;

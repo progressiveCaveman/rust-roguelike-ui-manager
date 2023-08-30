@@ -1,5 +1,5 @@
 use rltk::Point;
-use crate::{WIDTH, cp437::{converter::{string_to_cp437, to_cp437, FontCharType}, Assets, sprites::Drawable}, HEIGHT, World, Image};
+use crate::{WIDTH, assets::{cp437_converter::{string_to_cp437, to_cp437, FontCharType}, Assets, sprites::Drawable}, HEIGHT, World, Image};
 
 use self::console::{Console, ConsoleMode};
 

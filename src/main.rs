@@ -1,4 +1,4 @@
-use cp437::Assets;
+use assets::Assets;
 use error_iter::ErrorIter as _;
 use log::error;
 use map::Map;
@@ -15,7 +15,7 @@ use worldgen::basic_fill;
 pub mod map;
 pub mod screen;
 pub mod worldgen;
-pub mod cp437;
+pub mod assets;
 pub mod colors;
 
 const SCALE: i32 = 2;
