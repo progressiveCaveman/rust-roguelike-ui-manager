@@ -1,5 +1,5 @@
-use rltk::{Point, Algorithm2D, BaseMap};
-use serde::{Serialize, Deserialize};
+use rltk::{Algorithm2D, BaseMap, Point};
+use serde::{Deserialize, Serialize};
 use shipyard::Unique;
 
 #[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
@@ -7,13 +7,13 @@ pub enum TileType {
     Water,
     Sand,
     Dirt,
-    Stone
+    Stone,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Unique)]
 pub struct Map {
     pub tiles: Vec<TileType>,
-    pub size: (i32, i32)
+    pub size: (i32, i32),
 }
 
 impl Map {
@@ -21,8 +21,7 @@ impl Map {
         let count = (size.0 * size.1) as usize;
         Map {
             tiles: vec![tile_type; count],
-            size
-            // influence_maps:vec![vec![0.0; count]; 2],// todo magic numbers
+            size, // influence_maps:vec![vec![0.0; count]; 2],// todo magic numbers
         }
     }
 

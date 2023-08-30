@@ -1,5 +1,12 @@
+use crate::{
+    assets::{
+        cp437_converter::{string_to_cp437, to_cp437, FontCharType},
+        sprites::Drawable,
+        Assets,
+    },
+    Image, World, HEIGHT, WIDTH,
+};
 use rltk::Point;
-use crate::{WIDTH, assets::{cp437_converter::{string_to_cp437, to_cp437, FontCharType}, Assets, sprites::Drawable}, HEIGHT, World, Image};
 
 use self::console::{Console, ConsoleMode};
 
@@ -8,7 +15,7 @@ pub mod console;
 pub enum ScreenMode {
     ScreenTypeMainMenu,
     ScreenTypeLocalView,
-    ScreenTypeWorldView
+    ScreenTypeWorldView,
 }
 
 pub struct Screen {
@@ -17,7 +24,7 @@ pub struct Screen {
     pub state: i32,
     pub input_blocking: bool,
     pub mode: ScreenMode,
-    pub consoles: Vec<Console>
+    pub consoles: Vec<Console>,
 }
 
 impl Screen {
@@ -41,7 +48,8 @@ impl Screen {
         let y = 0;
         let w = self.size.0;
         let h = 10 * gsize;
-        self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::Log));
+        self.consoles
+            .push(Console::new((w, h), (x, y), ConsoleMode::Log));
         // let gsize = 8; // todo make this not magical
 
         // main window
@@ -49,7 +57,8 @@ impl Screen {
         let y = h;
         let w = w;
         let h = self.size.1 - h;
-        self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
+        self.consoles
+            .push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
     }
 
     // pub fn main_window(&self) -> &Console {
@@ -60,7 +69,7 @@ impl Screen {
     //     &self.consoles[0]
     // }
 
-    pub fn draw(&self, frame: &mut [u8], world: &World){
+    pub fn draw(&self, frame: &mut [u8], world: &World) {
         for c in self.consoles.iter() {
             c.render(frame, world);
         }
@@ -71,7 +80,7 @@ impl Screen {
         // match self.mode {
         //     ScreenMode::ScreenTypeMainMenu => {
         //         screen.draw_box(&world.assets, frame, Point { x: WIDTH * 1/3 - 8, y: HEIGHT/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
-        //         screen.print_string(&world.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });        
+        //         screen.print_string(&world.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });
         //     },
         //     ScreenMode::ScreenTypeLocalView => {
         //         let width = cmp::min(self.size.0 / gsize, map.size.0 / gsize);
@@ -92,7 +101,7 @@ impl Screen {
         //         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
         //             let x = (i % WIDTH as usize) as i32;
         //             let y = (i / WIDTH as usize) as i32;
-        
+
         //             let idx = map.xy_idx((x, y));
         //             let rgba = match map.tiles[idx] {
         //                 map::TileType::Water => [0x0f, 0x5e, 0x9c, 0xff],
@@ -100,7 +109,7 @@ impl Screen {
         //                 map::TileType::Dirt => [0x40, 0x29, 0x05, 0xff],
         //                 map::TileType::Stone => [0x39, 0x3d, 0x47, 0xff],
         //             };
-        
+
         //             pixel.copy_from_slice(&rgba);
         //         }
         //     },
@@ -123,7 +132,14 @@ impl Screen {
 
         for (idx, ch) in chars.iter().enumerate() {
             let sprite = &assets.cp437[*ch as usize];
-            Screen::blit(frame, &Point{ x:pos.x + idx as i32 * 8, y:pos.y }, sprite);
+            Screen::blit(
+                frame,
+                &Point {
+                    x: pos.x + idx as i32 * 8,
+                    y: pos.y,
+                },
+                sprite,
+            );
         }
     }
 
@@ -136,21 +152,59 @@ impl Screen {
         let swcorner = 200;
 
         self.print_cp437(assets, frame, nwcorner, pos);
-        self.print_cp437(assets, frame, necorner, Point { x: pos.x + size.x, y: pos.y });
-        self.print_cp437(assets, frame, swcorner, Point { x: pos.x + size.x, y: pos.y + size.y });
-        self.print_cp437(assets, frame, secorner, Point { x: pos.x, y: pos.y + size.y });
+        self.print_cp437(
+            assets,
+            frame,
+            necorner,
+            Point {
+                x: pos.x + size.x,
+                y: pos.y,
+            },
+        );
+        self.print_cp437(
+            assets,
+            frame,
+            swcorner,
+            Point {
+                x: pos.x + size.x,
+                y: pos.y + size.y,
+            },
+        );
+        self.print_cp437(
+            assets,
+            frame,
+            secorner,
+            Point {
+                x: pos.x,
+                y: pos.y + size.y,
+            },
+        );
 
-        for x in pos.x + 1 .. pos.x + size.x {
+        for x in pos.x + 1..pos.x + size.x {
             self.print_cp437(assets, frame, horizwall, Point { x: x, y: pos.y });
-            self.print_cp437(assets, frame, horizwall, Point { x: x, y: pos.y + size.y });
+            self.print_cp437(
+                assets,
+                frame,
+                horizwall,
+                Point {
+                    x: x,
+                    y: pos.y + size.y,
+                },
+            );
         }
 
-        for y in pos.y + 1 .. pos.y + size.y {
-            self.print_cp437(assets, frame, vertwall, Point { x: pos.x + size.x, y: y });
+        for y in pos.y + 1..pos.y + size.y {
+            self.print_cp437(
+                assets,
+                frame,
+                vertwall,
+                Point {
+                    x: pos.x + size.x,
+                    y: y,
+                },
+            );
             self.print_cp437(assets, frame, vertwall, Point { x: pos.x, y: y });
         }
-
-
 
         // if x < 1 || x > map.width-2 || y < 1 || y > map.height-2 as i32 { return 35; }
         // let mut mask : u8 = 0;
@@ -189,8 +243,8 @@ impl Screen {
             let xscreen = (i % WIDTH as usize) as i32;
             let yscreen = (i / WIDTH as usize) as i32;
 
-            let xrange = self.pos.0 .. self.pos.0 + self.size.0;
-            let yrange = self.pos.1 .. self.pos.1 + self.size.1;
+            let xrange = self.pos.0..self.pos.0 + self.size.0;
+            let yrange = self.pos.1..self.pos.1 + self.size.1;
 
             if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
                 let ximg = xscreen - self.pos.0;
@@ -200,7 +254,7 @@ impl Screen {
                 let rgba = image_buf[idx as usize];
 
                 pixel.copy_from_slice(&rgba);
-            }           
+            }
         }
     }
 
@@ -220,7 +274,9 @@ impl Screen {
             let i = dest.x * 4 + dest.y * WIDTH * 4 + y as i32 * WIDTH * 4;
 
             // Merge pixels from sprite into screen
-            let zipped = screen[i as usize..i as usize + width].iter_mut().zip(&pixels[s..s + width]);
+            let zipped = screen[i as usize..i as usize + width]
+                .iter_mut()
+                .zip(&pixels[s..s + width]);
             for (left, &right) in zipped {
                 if right > 0 {
                     *left = right;
@@ -257,5 +313,4 @@ impl Screen {
     //     line(screen, &p2, &p4, color);
     //     line(screen, &p4, p1, color);
     // }
-
 }

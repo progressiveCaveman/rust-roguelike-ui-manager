@@ -1,6 +1,6 @@
 /*
 
-Each screen will have a 
+Each screen will have a
 state
 size
 position
@@ -49,15 +49,15 @@ label
 
 */
 
+use crate::{colors, map, World, WIDTH};
 use rltk::Point;
-use crate::{World, WIDTH, map, colors};
 
 #[derive(Debug)]
 pub enum ConsoleMode {
     MainMenu,
     LocalMap,
     WorldMap,
-    Log
+    Log,
 }
 
 #[derive(Debug)]
@@ -67,18 +67,17 @@ pub struct Console {
     pub children: Vec<Console>,
     pub hidden: bool,
     pub z: i32,
-    pub mode: ConsoleMode
-    //fns: destroy (with children)
+    pub mode: ConsoleMode, //fns: destroy (with children)
 }
 
 impl Console {
     pub fn new(size: (i32, i32), pos: (i32, i32), mode: ConsoleMode) -> Console {
-        Self { 
-            size: size, 
-            pos: pos, 
-            children: vec![], 
-            hidden: false, 
-            z: 1, 
+        Self {
+            size: size,
+            pos: pos,
+            children: vec![],
+            hidden: false,
+            z: 1,
             mode: mode,
         }
     }
@@ -92,9 +91,28 @@ impl Console {
 
         match &self.mode {
             ConsoleMode::MainMenu => {
-                screen.draw_box(&world.assets, frame, Point { x: self.pos.0 + self.size.0 * 1/3 - 8, y: self.pos.1 + self.size.1/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
-                screen.print_string(&world.assets, frame, "Hello World", Point { x: self.pos.0 + self.size.0 * 1/3, y: self.pos.1 + self.size.1/2 - 4 });        
-            },
+                screen.draw_box(
+                    &world.assets,
+                    frame,
+                    Point {
+                        x: self.pos.0 + self.size.0 * 1 / 3 - 8,
+                        y: self.pos.1 + self.size.1 / 2 - 4 - 8,
+                    },
+                    Point {
+                        x: 12 * 8,
+                        y: 2 * 8,
+                    },
+                );
+                screen.print_string(
+                    &world.assets,
+                    frame,
+                    "Hello World",
+                    Point {
+                        x: self.pos.0 + self.size.0 * 1 / 3,
+                        y: self.pos.1 + self.size.1 / 2 - 4,
+                    },
+                );
+            }
             ConsoleMode::LocalMap => {
                 let widthchars = self.size.0 / gsize;
                 let heightchars = self.size.1 / gsize;
@@ -102,19 +120,29 @@ impl Console {
                 for x in 0..widthchars {
                     for y in 0..heightchars {
                         // todo check bounds
-                        if x < self.pos.0 + self.size.0 + gsize && y < self.pos.1 + self.size.1 + gsize {
-                            screen.print_char(&world.assets, frame, map.get_glyph(Point { x, y }), Point { x: self.pos.0 + x * gsize, y: self.pos.1 + y * gsize});                            
+                        if x < self.pos.0 + self.size.0 + gsize
+                            && y < self.pos.1 + self.size.1 + gsize
+                        {
+                            screen.print_char(
+                                &world.assets,
+                                frame,
+                                map.get_glyph(Point { x, y }),
+                                Point {
+                                    x: self.pos.0 + x * gsize,
+                                    y: self.pos.1 + y * gsize,
+                                },
+                            );
                         }
                     }
                 }
-            },
+            }
             ConsoleMode::WorldMap => {
                 for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
                     let xscreen = (i % WIDTH as usize) as i32;
                     let yscreen = (i / WIDTH as usize) as i32;
 
-                    let xrange = self.pos.0 .. self.pos.0 + self.size.0;
-                    let yrange = self.pos.1 .. self.pos.1 + self.size.1;
+                    let xrange = self.pos.0..self.pos.0 + self.size.0;
+                    let yrange = self.pos.1..self.pos.1 + self.size.1;
 
                     if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
                         let xmap = (xscreen - self.pos.0);
@@ -129,12 +157,23 @@ impl Console {
                         };
 
                         pixel.copy_from_slice(&rgba);
-                    }        
+                    }
                 }
-            },
+            }
             ConsoleMode::Log => {
-                screen.draw_box(&world.assets, frame, Point { x: self.pos.0, y: self.pos.1 }, Point { x: self.size.0 - 8, y: self.size.1- 8 });
-            },
+                screen.draw_box(
+                    &world.assets,
+                    frame,
+                    Point {
+                        x: self.pos.0,
+                        y: self.pos.1,
+                    },
+                    Point {
+                        x: self.size.0 - 8,
+                        y: self.size.1 - 8,
+                    },
+                );
+            }
         }
     }
 }

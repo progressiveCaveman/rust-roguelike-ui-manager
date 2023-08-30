@@ -1,6 +1,6 @@
 /*
 
-Notes on perlin examples: 
+Notes on perlin examples:
 
 This could be adopted to coasts by setting large gradient ares to certain ranges, then a quick gradient change between e.g. water to coast
     // Create a jade palette.
@@ -80,7 +80,17 @@ pub fn generate_wood() -> Image {
     let rotated_wood = RotatePoint::new(translated_wood).set_angles(84.0, 0.0, 0.0, 0.0);
 
     // Finally, perturb the wood texture again to produce the final texture.
-    let final_wood: Turbulence<RotatePoint<TranslatePoint<Turbulence<Add<f64, Cylinders, ScaleBias<f64, ScalePoint<BasicMulti<Perlin>>, 2>, 2>, Perlin>>>, Perlin> = Turbulence::<_, Perlin>::new(rotated_wood)
+    let final_wood: Turbulence<
+        RotatePoint<
+            TranslatePoint<
+                Turbulence<
+                    Add<f64, Cylinders, ScaleBias<f64, ScalePoint<BasicMulti<Perlin>>, 2>, 2>,
+                    Perlin,
+                >,
+            >,
+        >,
+        Perlin,
+    > = Turbulence::<_, Perlin>::new(rotated_wood)
         .set_seed(2)
         .set_frequency(2.0)
         .set_power(1.0 / 64.0)
@@ -98,7 +108,7 @@ pub fn generate_wood() -> Image {
         .add_gradient_point(1.0, [60, 10, 8, 255]);
 
     let mut renderer = ImageRenderer::new().set_gradient(wood_gradient);
- 
+
     //  utils::write_image_to_file(&renderer.render(&planar_texture), "texture_wood_planar.png");
 
     let image = &renderer.render(&planar_texture);
@@ -106,7 +116,6 @@ pub fn generate_wood() -> Image {
 }
 
 pub fn generate_jade() -> Image {
-
     // Primary jade texture. The ridges from the ridged-multifractal function
     // produces the veins.
     let primary_jade = RidgedMulti::<Perlin>::new(0)
@@ -133,9 +142,10 @@ pub fn generate_jade() -> Image {
 
     // Scale the secondary jade texture so it makes a small contribution to the
     // final jade texture.
-    let secondary_jade: ScaleBias<_, Turbulence<RotatePoint<Cylinders>, Perlin>, 2> = ScaleBias::new(perturbed_base_secondary_jade)
-        .set_scale(0.25)
-        .set_bias(0.0);
+    let secondary_jade: ScaleBias<_, Turbulence<RotatePoint<Cylinders>, Perlin>, 2> =
+        ScaleBias::new(perturbed_base_secondary_jade)
+            .set_scale(0.25)
+            .set_bias(0.0);
 
     // Add the two jade textures together. These two textures were produced
     // using different combinations of coherent noise, so the final texture
@@ -169,7 +179,7 @@ pub fn generate_jade() -> Image {
         .add_gradient_point(1.000, [29, 135, 102, 255]);
 
     let mut renderer = ImageRenderer::new().set_gradient(jade_gradient);
-    
+
     let image = &renderer.render(&planar_texture);
     noise_image_to_image(image)
 }
@@ -177,10 +187,11 @@ pub fn generate_jade() -> Image {
 pub fn basic() -> Image {
     let perlin = Perlin::default();
     let turbulence = Turbulence::<_, Perlin>::new(perlin);
-    let noisemap = PlaneMapBuilder::<noise::Turbulence<noise::Perlin, noise::Perlin>, 2>::new(turbulence)
-        .set_size(1024, 1024)
-        .set_is_seamless(true)
-        .build();
+    let noisemap =
+        PlaneMapBuilder::<noise::Turbulence<noise::Perlin, noise::Perlin>, 2>::new(turbulence)
+            .set_size(1024, 1024)
+            .set_is_seamless(true)
+            .build();
 
     // let hybrid_multi = HybridMulti::<Perlin>::default();
     // let noisemap = PlaneMapBuilder::<noise::HybridMulti<noise::Perlin>, 2>::new(hybrid_multi)
@@ -195,15 +206,14 @@ pub fn basic() -> Image {
     //     .build();
 
     // Create a jade palette.
-    let land_gradient = ColorGradient::new()
-        .build_terrain_gradient();
-        // .clear_gradient()
-        // .add_gradient_point(-1.000, COLOR_DARK_BLUE)
-        // .add_gradient_point(-0.25, COLOR_DARKER_BLUE)
-        // .add_gradient_point(-0.25, COLOR_DARKER_GREEN)
-        // .add_gradient_point(0.0, COLOR_DARKEST_GREEN)
-        // .add_gradient_point(0.0, COLOR_LIGHT_GREY)
-        // .add_gradient_point(0.5, COLOR_GREY);
+    let land_gradient = ColorGradient::new().build_terrain_gradient();
+    // .clear_gradient()
+    // .add_gradient_point(-1.000, COLOR_DARK_BLUE)
+    // .add_gradient_point(-0.25, COLOR_DARKER_BLUE)
+    // .add_gradient_point(-0.25, COLOR_DARKER_GREEN)
+    // .add_gradient_point(0.0, COLOR_DARKEST_GREEN)
+    // .add_gradient_point(0.0, COLOR_LIGHT_GREY)
+    // .add_gradient_point(0.5, COLOR_GREY);
 
     let mut renderer = ImageRenderer::new().set_gradient(land_gradient);
 

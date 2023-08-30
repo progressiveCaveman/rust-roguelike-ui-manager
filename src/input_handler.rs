@@ -1,18 +1,17 @@
 use winit::event::{Event, VirtualKeyCode};
 use winit_input_helper::WinitInputHelper;
 
-use crate::{World, screen::console::ConsoleMode};
+use crate::{screen::console::ConsoleMode, World};
 
 pub enum Action {
     None,
-    Exit
+    Exit,
 }
 
 pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
-
     // Esc
     if input.key_pressed(VirtualKeyCode::Escape) {
-        return Action::Exit
+        return Action::Exit;
     }
 
     // V
@@ -25,5 +24,5 @@ pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
         }
     }
 
-    return Action::None
+    return Action::None;
 }

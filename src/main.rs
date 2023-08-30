@@ -13,12 +13,12 @@ use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 use worldgen::basic_fill;
 
-pub mod map;
-pub mod screen;
-pub mod worldgen;
 pub mod assets;
 pub mod colors;
 pub mod input_handler;
+pub mod map;
+pub mod screen;
+pub mod worldgen;
 
 const SCALE: i32 = 2;
 const WIDTH: i32 = 640 * SCALE;
@@ -34,7 +34,7 @@ pub struct World {
     pub assets: Assets,
     pub glyph_size: i32,
     pub tick: i32,
-    pub image: Image
+    pub image: Image,
 }
 
 impl World {
@@ -128,13 +128,11 @@ fn main() -> Result<(), Error> {
             }
 
             match handle_input(&input, &mut world) {
-                Action::None => {
-                    
-                },
+                Action::None => {}
                 Action::Exit => {
                     *control_flow = ControlFlow::Exit;
                     return;
-                },
+                }
             }
 
             // Resize the window

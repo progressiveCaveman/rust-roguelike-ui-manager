@@ -5,7 +5,7 @@ use std::vec;
 use rand::Rng;
 use rltk::Point;
 
-use crate::map::{TileType, Map};
+use crate::map::{Map, TileType};
 
 pub fn basic_fill(map: &mut Map) {
     let size = map.size;
@@ -14,7 +14,7 @@ pub fn basic_fill(map: &mut Map) {
         let start1 = map.xy_idx(rnd_point(size));
         if i % 3 == 0 {
             map.tiles[start1] = TileType::Dirt;
-        }else if i % 3 == 1 {
+        } else if i % 3 == 1 {
             map.tiles[start1] = TileType::Sand;
         } else {
             map.tiles[start1] = TileType::Stone;
