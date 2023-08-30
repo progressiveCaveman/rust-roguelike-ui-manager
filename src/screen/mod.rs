@@ -1,5 +1,5 @@
 use rltk::Point;
-use crate::{WIDTH, cp437::{converter::{string_to_cp437, to_cp437, FontCharType}, Assets, blit, sprites::Drawable}, HEIGHT, World, Image};
+use crate::{WIDTH, cp437::{converter::{string_to_cp437, to_cp437, FontCharType}, Assets, sprites::Drawable}, HEIGHT, World, Image};
 
 use self::console::{Console, ConsoleMode};
 
@@ -46,7 +46,7 @@ impl Screen {
 
         // main window
         let x = 0;
-        let y = y + w;
+        let y = h;
         let w = w;
         let h = self.size.1 - h;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
@@ -109,12 +109,12 @@ impl Screen {
 
     pub fn print_char(&self, assets: &Assets, frame: &mut [u8], ch: char, pos: Point) {
         let sprite = &assets.cp437[to_cp437(ch) as usize];
-        blit(frame, &pos, sprite);
+        Screen::blit(frame, &pos, sprite);
     }
 
     pub fn print_cp437(&self, assets: &Assets, frame: &mut [u8], ch: FontCharType, pos: Point) {
         let sprite = &assets.cp437[ch as usize];
-        blit(frame, &pos, sprite);
+        Screen::blit(frame, &pos, sprite);
     }
 
     pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: Point) {
@@ -123,7 +123,7 @@ impl Screen {
 
         for (idx, ch) in chars.iter().enumerate() {
             let sprite = &assets.cp437[*ch as usize];
-            blit(frame, &Point{ x:pos.x + idx as i32 * 8, y:pos.y }, sprite);
+            Screen::blit(frame, &Point{ x:pos.x + idx as i32 * 8, y:pos.y }, sprite);
         }
     }
 

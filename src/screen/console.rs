@@ -101,8 +101,12 @@ impl Console {
                 for x in 0..widthchars {
                     for y in 0..heightchars {
                         // todo check bounds
-                        screen.print_char(&world.assets, frame, map.get_glyph(Point { x, y }), Point { x: self.pos.0 + x * gsize, y: self.pos.1 + y * gsize});
-
+                        dbg!(x,y);
+                        dbg!(self.pos);
+                        dbg!(self.size);
+                        if x < self.pos.0 + self.size.0 + gsize && y < self.pos.1 + self.size.1 + gsize {
+                            screen.print_char(&world.assets, frame, map.get_glyph(Point { x, y }), Point { x: self.pos.0 + x * gsize, y: self.pos.1 + y * gsize});                            
+                        }
                     }
                 }
 

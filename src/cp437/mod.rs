@@ -47,31 +47,3 @@ impl Assets{
         }
     }
 }
-
-/// Blit a drawable to the pixel buffer.
-pub fn blit<S>(screen: &mut [u8], dest: &Point, sprite: &S)
-where
-    S: Drawable,
-{
-    assert!(dest.x + sprite.width() as i32 <= WIDTH);
-    assert!(dest.y + sprite.height() as i32 <= HEIGHT);
-
-    let pixels = sprite.pixels();
-    let width = sprite.width() * 4;
-
-    let mut s = 0;
-    for y in 0..sprite.height() {
-        let i = dest.x * 4 + dest.y * WIDTH * 4 + y as i32 * WIDTH * 4;
-
-        // Merge pixels from sprite into screen
-        let zipped = screen[i as usize..i as usize + width].iter_mut().zip(&pixels[s..s + width]);
-        for (left, &right) in zipped {
-            if right > 0 {
-                *left = right;
-            }
-            // *left = right;
-        }
-
-        s += width;
-    }
-}
