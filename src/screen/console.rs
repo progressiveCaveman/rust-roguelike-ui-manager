@@ -92,7 +92,8 @@ impl Console {
 
         match &self.mode {
             ConsoleMode::MainMenu => {
-
+                screen.draw_box(&world.assets, frame, Point { x: self.pos.0 + self.size.0 * 1/3 - 8, y: self.pos.1 + self.size.1/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
+                screen.print_string(&world.assets, frame, "Hello World", Point { x: self.pos.0 + self.size.0 * 1/3, y: self.pos.1 + self.size.1/2 - 4 });        
             },
             ConsoleMode::LocalMap => {
                 let widthchars = self.size.0 / gsize;
@@ -101,9 +102,6 @@ impl Console {
                 for x in 0..widthchars {
                     for y in 0..heightchars {
                         // todo check bounds
-                        dbg!(x,y);
-                        dbg!(self.pos);
-                        dbg!(self.size);
                         if x < self.pos.0 + self.size.0 + gsize && y < self.pos.1 + self.size.1 + gsize {
                             screen.print_char(&world.assets, frame, map.get_glyph(Point { x, y }), Point { x: self.pos.0 + x * gsize, y: self.pos.1 + y * gsize});                            
                         }
@@ -141,10 +139,13 @@ impl Console {
                     }        
                 }
             },
-            _ => {
-                screen.draw_box(&world.assets, frame, Point { x: WIDTH * 1/3 - 8, y: HEIGHT/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
-                screen.print_string(&world.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });        
-            }
+            ConsoleMode::Log => {
+                screen.draw_box(&world.assets, frame, Point { x: self.pos.0, y: self.pos.1 }, Point { x: self.size.0 - 8, y: self.size.1- 8 });
+            },
+            // _ => {
+            //     screen.draw_box(&world.assets, frame, Point { x: self.pos.0 + self.size.0 * 1/3 - 8, y: self.pos.1 + self.size.1/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
+            //     screen.print_string(&world.assets, frame, "Hello World", Point { x: self.pos.0 + self.size.0 * 1/3, y: self.pos.1 + self.size.1/2 - 4 });        
+            // }
         }
     }
 }
