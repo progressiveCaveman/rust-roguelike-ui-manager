@@ -1,12 +1,13 @@
 use assets::Assets;
 use error_iter::ErrorIter as _;
+use input_handler::{handle_input, Action};
 use log::error;
 use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
-use screen::console::ConsoleMode;
+
 use screen::Screen;
 use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode};
+use winit::event::Event;
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
@@ -17,6 +18,7 @@ pub mod screen;
 pub mod worldgen;
 pub mod assets;
 pub mod colors;
+pub mod input_handler;
 
 const SCALE: i32 = 2;
 const WIDTH: i32 = 640 * SCALE;
@@ -120,21 +122,19 @@ fn main() -> Result<(), Error> {
         // Handle input events
         if input.update(&event) {
             // Close events
-            if input.key_pressed(VirtualKeyCode::Escape) || input.close_requested() {
+            if input.close_requested() {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
 
-            // Key events
-
-            // V
-            if input.key_pressed(VirtualKeyCode::V) {
-                world.screen.consoles[1].mode = match world.screen.consoles[1].mode {
-                    ConsoleMode::MainMenu => ConsoleMode::WorldMap,
-                    ConsoleMode::LocalMap => ConsoleMode::WorldMap,
-                    ConsoleMode::WorldMap => ConsoleMode::LocalMap,
-                    ConsoleMode::Log => ConsoleMode::Log,
-                }
+            match handle_input(&input, &mut world) {
+                Action::None => {
+                    
+                },
+                Action::Exit => {
+                    *control_flow = ControlFlow::Exit;
+                    return;
+                },
             }
 
             // Resize the window
