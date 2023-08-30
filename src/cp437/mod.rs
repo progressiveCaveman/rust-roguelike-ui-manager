@@ -1,10 +1,7 @@
 use image::{self};
 use image::GenericImageView;
-use rltk::Point;
 
-use crate::{WIDTH, HEIGHT};
-
-use self::sprites::{Sprite, Drawable}; // to allow calling .pixels()
+use self::sprites::Sprite;
 
 pub mod converter;
 pub mod sprites;

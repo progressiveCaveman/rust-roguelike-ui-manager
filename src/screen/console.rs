@@ -50,7 +50,7 @@ label
 */
 
 use rltk::Point;
-use crate::{World, WIDTH, map, HEIGHT};
+use crate::{World, WIDTH, map, colors};
 
 #[derive(Debug)]
 pub enum ConsoleMode {
@@ -107,13 +107,6 @@ impl Console {
                         }
                     }
                 }
-
-                // for x in self.pos.0 .. self.pos.0 + (self.size.0 / gsize) {
-                //     for y in self.pos.1 .. self.pos.1 + (self.size.1 / gsize) {
-                //         // todo bounds check
-                //         screen.print_char(&world.assets, frame, map.get_glyph(Point { x, y }), Point { x: x * gsize, y: y * gsize });
-                //     }
-                // }
             },
             ConsoleMode::WorldMap => {
                 for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
@@ -124,15 +117,15 @@ impl Console {
                     let yrange = self.pos.1 .. self.pos.1 + self.size.1;
 
                     if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                        let xmap = (xscreen - self.pos.0) / gsize;
-                        let ymap = (yscreen - self.pos.1) / gsize;
+                        let xmap = (xscreen - self.pos.0);
+                        let ymap = (yscreen - self.pos.1);
 
                         let idx = map.xy_idx((xmap, ymap));
                         let rgba = match map.tiles[idx] {
-                            map::TileType::Water => [0x0f, 0x5e, 0x9c, 0xff],
-                            map::TileType::Sand => [0xe1, 0xbf, 0x92, 0xff],
-                            map::TileType::Dirt => [0x40, 0x29, 0x05, 0xff],
-                            map::TileType::Stone => [0x39, 0x3d, 0x47, 0xff],
+                            map::TileType::Water => colors::COLOR_DARK_BLUE,
+                            map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
+                            map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
+                            map::TileType::Stone => colors::COLOR_GREY,
                         };
 
                         pixel.copy_from_slice(&rgba);
@@ -142,10 +135,6 @@ impl Console {
             ConsoleMode::Log => {
                 screen.draw_box(&world.assets, frame, Point { x: self.pos.0, y: self.pos.1 }, Point { x: self.size.0 - 8, y: self.size.1- 8 });
             },
-            // _ => {
-            //     screen.draw_box(&world.assets, frame, Point { x: self.pos.0 + self.size.0 * 1/3 - 8, y: self.pos.1 + self.size.1/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
-            //     screen.print_string(&world.assets, frame, "Hello World", Point { x: self.pos.0 + self.size.0 * 1/3, y: self.pos.1 + self.size.1/2 - 4 });        
-            // }
         }
     }
 }

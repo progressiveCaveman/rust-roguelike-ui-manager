@@ -16,7 +16,7 @@ pub mod map;
 pub mod screen;
 pub mod worldgen;
 pub mod cp437;
-pub mod palette;
+pub mod colors;
 
 const SCALE: i32 = 2;
 const WIDTH: i32 = 640 * SCALE;
