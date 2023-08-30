@@ -2,7 +2,7 @@ pub mod world;
 
 use std::vec;
 
-use rand::{Rng, seq::SliceRandom, rngs::StdRng, SeedableRng};
+use rand::{Rng, thread_rng};
 use rltk::Point;
 
 use crate::map::{TileType, Map};
@@ -30,7 +30,7 @@ fn fill_recursive(map: &mut Map, depth: i32) {
 
     let mut new: Vec<TileType> = vec![TileType::Water; map.tiles.len()];
     let mut water = 0;
-    let mut rng = StdRng::from_entropy();
+    let mut rng = thread_rng();
 
     for index in 0..map.tiles.len() {
         let tile = map.tiles[index];
@@ -39,19 +39,21 @@ fn fill_recursive(map: &mut Map, depth: i32) {
         if tile == TileType::Water {
             water += 1;
 
-            let mut neighbors = get_neighbors(map.idx_point(index));
-            neighbors.shuffle(&mut rng);
+            let neighbors = get_neighbors(map.idx_point(index));
+            // let idx = Uniform::new(0, neighbors.len());//rng.next_u32() as usize * neighbors.len();
+            let p = neighbors[rng.gen_range(0..neighbors.len())];
+            // neighbors.shuffle(&mut rng);
 
-            for p in neighbors.iter() {
+            // for p in neighbors.iter() {
                 if map.in_bounds((p.x.try_into().unwrap(), p.y.try_into().unwrap())) {
-                    let idx = map.point_idx(*p);
+                    let idx = map.point_idx(p);
                     let t = map.tiles[idx];
                     if t != TileType::Water {
                         new[index] = t;
                         break;
                     }
                 }
-            }
+            // }
         }
     }
 
