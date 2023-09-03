@@ -46,9 +46,8 @@ pub struct Sprite {
 impl Sprite {
     // assumes bg is fuscia and fg is greyscale
     pub fn with_color(&self, bg: Color, fg: Color) -> Sprite {
-        let mut source = self.clone();
         let mut s = self.clone();
-        for (i, pixel) in source.pixels.chunks_exact_mut(4).enumerate() {
+        for (i, pixel) in self.pixels.chunks_exact(4).enumerate() {
             assert!(pixel.len() == 4);
             for i2 in 0..4 {
                 let idx = i * 4 + i2;

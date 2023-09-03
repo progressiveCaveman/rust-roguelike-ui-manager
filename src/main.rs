@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use assets::Assets;
 use error_iter::ErrorIter as _;
 use input_handler::{handle_input, Action};
@@ -86,7 +84,6 @@ impl World {
 }
 
 fn main() -> Result<(), Error> {
-    let start = Instant::now();
     env_logger::init();
 
     // create the window
@@ -119,12 +116,6 @@ fn main() -> Result<(), Error> {
 
     // main event loop
     event_loop.run(move |event, _, control_flow| {
-        if start.elapsed().as_millis() > 10000 {
-            *control_flow = ControlFlow::Exit;
-            dbg!(world.tick);
-            return;
-        }
-
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
             world.draw(pixels.frame_mut());
