@@ -1,4 +1,4 @@
-use std::iter::zip;
+use std::{iter::zip, cmp};
 
 use crate::{
     assets::{
@@ -74,6 +74,22 @@ impl Screen {
         if self.consoles[1].zoom > 1 {
             self.consoles[1].zoom -= 1;
         }
+    }
+
+    pub fn pan_map(&mut self, offset: (i32, i32)) {
+        self.consoles[1].map_pos = {
+            let mp = self.consoles[1].map_pos;
+            (
+                cmp::max(
+                    0, 
+                    mp.0 as i32 + offset.0,
+                ) as usize,
+                cmp::max(
+                    0, 
+                    mp.1 as i32 + offset.1,
+                ) as usize,
+            )
+        };
     }
 
     pub fn draw(&self, frame: &mut [u8], world: &World) {

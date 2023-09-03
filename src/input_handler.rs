@@ -39,5 +39,25 @@ pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
         basic_fill(&mut world.map);
     }
 
+    // Up : pan map
+    if input.key_pressed(VirtualKeyCode::Up) {
+        world.screen.pan_map((0, -1));
+    }
+
+    // Down : pan map
+    if input.key_pressed(VirtualKeyCode::Down) {
+        world.screen.pan_map((0, 1));
+    }
+
+    // Left : pan map
+    if input.key_pressed(VirtualKeyCode::Left) {
+        world.screen.pan_map((-1, 0));
+    }
+
+    // Right : pan map
+    if input.key_pressed(VirtualKeyCode::Right) {
+        world.screen.pan_map((1, 0));
+    }
+
     return Action::None;
 }

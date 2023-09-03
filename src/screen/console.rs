@@ -69,6 +69,7 @@ pub struct Console {
     pub z: i32, // not used yet
     pub mode: ConsoleMode, //fns: destroy (with children)
     pub zoom: usize, // Only used for map object
+    pub map_pos: (usize, usize), // Only used for map object
 }
 
 impl Console {
@@ -81,6 +82,7 @@ impl Console {
             z: 1,
             mode: mode,
             zoom: 1,
+            map_pos: (0, 0),
         }
     }
 
@@ -129,8 +131,8 @@ impl Console {
                         let yrange = self.pos.1..self.pos.1 + self.size.1;
     
                         if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                            let xmap = (xscreen - self.pos.0) / zoom;
-                            let ymap = (yscreen - self.pos.1) / zoom;
+                            let xmap = self.map_pos.0 + (xscreen - self.pos.0) / zoom;
+                            let ymap = self.map_pos.1 + (yscreen - self.pos.1) / zoom;
     
                             let idx = map.xy_idx((xmap, ymap));
                             let rgba = match map.tiles[idx] {
