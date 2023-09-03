@@ -2,6 +2,20 @@
 // tcod-sys/libtcod/include/libtcod_int.h
 pub type Color = [u8; 4];
 
+pub trait Scale {
+    fn scale(&self, scale: f32) -> Self;
+}
+
+impl Scale for Color {
+    fn scale(&self, scale: f32) -> Self {
+        let mut c = self.clone();
+        for i in 0..3 { // don't scale alpha
+            c[i] = (c[i] as f32 * scale) as u8;
+        }
+        c
+    }
+}
+
 pub const COLOR_CLEAR: Color = [0, 0, 0, 0];
 pub const COLOR_BLACK: Color = [0, 0, 0, 255];
 pub const COLOR_DARKEST_GREY: Color = [31, 31, 31, 255];

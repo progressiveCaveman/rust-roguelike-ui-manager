@@ -49,7 +49,7 @@ label
 
 */
 
-use crate::{colors, map, World, WIDTH, Point, assets::cp437_converter::to_cp437};
+use crate::{colors::{self, Scale}, map, World, WIDTH, Point, assets::cp437_converter::to_cp437};
 
 use super::Glyph;
 
@@ -168,7 +168,7 @@ impl Console {
                                         },
                                         ch: to_cp437(map.get_glyph(Point { x, y })),
                                         fg: rgba,
-                                        bg: colors::COLOR_CLEAR,
+                                        bg: rgba.scale(0.5),
                                     }
                                 );
                             }

@@ -13,7 +13,7 @@ pub fn basic_fill(map: &mut Map) {
         map.tiles[i] = TileType::Water;
     }
 
-    for i in 0..9 {
+    for i in 0..240 {
         let start1 = map.xy_idx(rnd_point(size));
         if i % 3 == 0 {
             map.tiles[start1] = TileType::Dirt;
