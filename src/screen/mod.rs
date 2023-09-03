@@ -4,7 +4,7 @@ use crate::{
         sprites::Drawable,
         Assets,
     },
-    Image, World, HEIGHT, WIDTH,
+    Image, World, HEIGHT, WIDTH, colors::Color,
 };
 use rltk::Point;
 
@@ -12,19 +12,19 @@ use self::console::{Console, ConsoleMode};
 
 pub mod console;
 
-pub enum ScreenMode {
-    ScreenTypeMainMenu,
-    ScreenTypeLocalView,
-    ScreenTypeWorldView,
-}
+const MAX_ZOOM: usize = 7;
 
 pub struct Screen {
     pub size: (i32, i32),
     pub pos: (i32, i32),
-    pub state: i32,
     pub input_blocking: bool,
-    pub mode: ScreenMode,
-    pub consoles: Vec<Console>,
+    consoles: Vec<Console>,
+}
+
+pub struct Glyph {
+    pub pos: Point,
+    pub fg: Color,
+    pub bg: Color,
 }
 
 impl Screen {
@@ -33,9 +33,7 @@ impl Screen {
         Self {
             size,
             pos,
-            state: 0,
             input_blocking: false,
-            mode: ScreenMode::ScreenTypeMainMenu,
             consoles: Vec::new(),
         }
     }
@@ -48,8 +46,7 @@ impl Screen {
         let y = 0;
         let w = self.size.0;
         let h = 10 * gsize;
-        self.consoles
-            .push(Console::new((w, h), (x, y), ConsoleMode::Log));
+        self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::Log));
         // let gsize = 8; // todo make this not magical
 
         // main window
@@ -57,63 +54,29 @@ impl Screen {
         let y = h;
         let w = w;
         let h = self.size.1 - h;
-        self.consoles
-            .push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
+        self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
     }
 
-    // pub fn main_window(&self) -> &Console {
-    //     &self.consoles[1]
-    // }
+    pub fn set_main_console_mode(&mut self, mode: ConsoleMode) {
+        self.consoles[1].mode = mode;
+    }
 
-    // pub fn log_window(&self) -> &Console {
-    //     &self.consoles[0]
-    // }
+    pub fn increment_zoom(&mut self) {
+        if self.consoles[1].zoom < MAX_ZOOM {
+            self.consoles[1].zoom += 1;
+        }
+    }
+
+    pub fn decrement_zoom(&mut self) {
+        if self.consoles[1].zoom > 1 {
+            self.consoles[1].zoom -= 1;
+        }
+    }
 
     pub fn draw(&self, frame: &mut [u8], world: &World) {
         for c in self.consoles.iter() {
             c.render(frame, world);
         }
-        // let map = &world.map;
-        // let screen = &world.screen;
-        // let gsize = world.glyph_size;
-
-        // match self.mode {
-        //     ScreenMode::ScreenTypeMainMenu => {
-        //         screen.draw_box(&world.assets, frame, Point { x: WIDTH * 1/3 - 8, y: HEIGHT/2 - 4 - 8 }, Point { x: 12 * 8, y: 2 * 8 });
-        //         screen.print_string(&world.assets, frame, "Hello World", Point { x: WIDTH * 1/3, y: HEIGHT/2 - 4 });
-        //     },
-        //     ScreenMode::ScreenTypeLocalView => {
-        //         let width = cmp::min(self.size.0 / gsize, map.size.0 / gsize);
-        //         let height = cmp::min(self.size.1 / gsize, map.size.1 / gsize);
-
-        //         for x in 0 .. width {
-        //             for y in 0 .. height {
-        //                 let xm = x + self.pos.0;
-        //                 let ym = y + self.pos.1;
-        //                 if map.in_bounds((xm, ym)) {
-        //                     let p = Point { x: xm, y: ym };
-        //                     screen.print_char(&world.assets, frame, map.get_glyph(p), Point { x: x * gsize, y: y * gsize });
-        //                 }
-        //             }
-        //         }
-        //     },
-        //     ScreenMode::ScreenTypeWorldView => {
-        //         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-        //             let x = (i % WIDTH as usize) as i32;
-        //             let y = (i / WIDTH as usize) as i32;
-
-        //             let idx = map.xy_idx((x, y));
-        //             let rgba = match map.tiles[idx] {
-        //                 map::TileType::Water => [0x0f, 0x5e, 0x9c, 0xff],
-        //                 map::TileType::Sand => [0xe1, 0xbf, 0x92, 0xff],
-        //                 map::TileType::Dirt => [0x40, 0x29, 0x05, 0xff],
-        //                 map::TileType::Stone => [0x39, 0x3d, 0x47, 0xff],
-        //             };
-
-        //             pixel.copy_from_slice(&rgba);
-        //         }
-        //     },
-        // }
     }
 
     pub fn print_char(&self, assets: &Assets, frame: &mut [u8], ch: char, pos: Point) {

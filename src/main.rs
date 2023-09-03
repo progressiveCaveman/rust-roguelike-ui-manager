@@ -32,7 +32,6 @@ pub struct World {
     pub map: Map,
     pub screen: Screen,
     pub assets: Assets,
-    pub glyph_size: i32,
     pub tick: i32,
     pub image: Image,
 }
@@ -43,7 +42,6 @@ impl World {
             map: Map::new(map::TileType::Water, (WIDTH, HEIGHT)),
             screen: Screen::new((WIDTH, HEIGHT), (0, 0)),
             assets: Assets::new(),
-            glyph_size: 8,
             tick: 0,
             image: (Vec::new(), (0, 0)),
         }
