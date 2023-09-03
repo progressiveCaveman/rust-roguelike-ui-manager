@@ -20,13 +20,22 @@ pub mod map;
 pub mod screen;
 pub mod worldgen;
 
-const SCALE: i32 = 2;
-const WIDTH: i32 = 640 * SCALE;
-const HEIGHT: i32 = 480 * SCALE;
-// const WIDTH: i32 = 320;
-// const HEIGHT: i32 = 320;
+const SCALE: usize = 2;
+const WIDTH: usize = 640 * SCALE;
+const HEIGHT: usize = 480 * SCALE;
+// const WIDTH: usize = 320;
+// const HEIGHT: usize = 320;
 
 type Image = (Vec<[u8; 4]>, (usize, usize));
+
+
+#[derive(Debug, Clone, Copy)]
+pub struct Point {
+    /// The point's X location
+    pub x: usize,
+    /// The point's Y location
+    pub y: usize,
+}
 
 pub struct World {
     pub map: Map,

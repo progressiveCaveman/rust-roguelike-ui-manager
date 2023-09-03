@@ -4,9 +4,8 @@ use crate::{
         sprites::Drawable,
         Assets,
     },
-    Image, World, HEIGHT, WIDTH, colors::Color,
+    Image, World, HEIGHT, WIDTH, colors::Color, Point,
 };
-use rltk::Point;
 
 use self::console::{Console, ConsoleMode};
 
@@ -15,8 +14,8 @@ pub mod console;
 const MAX_ZOOM: usize = 8;
 
 pub struct Screen {
-    pub size: (i32, i32),
-    pub pos: (i32, i32),
+    pub size: (usize, usize),
+    pub pos: (usize, usize),
     pub input_blocking: bool,
     consoles: Vec<Console>,
 }
@@ -29,7 +28,7 @@ pub struct Glyph {
 
 impl Screen {
     /// Create a new `World` instance that can draw a moving box.
-    pub fn new(size: (i32, i32), pos: (i32, i32)) -> Self {
+    pub fn new(size: (usize, usize), pos: (usize, usize)) -> Self {
         Self {
             size,
             pos,
@@ -98,7 +97,7 @@ impl Screen {
             Screen::blit(
                 frame,
                 &Point {
-                    x: pos.x + idx as i32 * 8,
+                    x: pos.x + idx * 8,
                     y: pos.y,
                 },
                 sprite,
@@ -203,8 +202,8 @@ impl Screen {
             let image_buf = &image.0;
             let size = image.1;
 
-            let xscreen = (i % WIDTH as usize) as i32;
-            let yscreen = (i / WIDTH as usize) as i32;
+            let xscreen = i % WIDTH;
+            let yscreen = i / WIDTH;
 
             let xrange = self.pos.0..self.pos.0 + self.size.0;
             let yrange = self.pos.1..self.pos.1 + self.size.1;
@@ -213,8 +212,8 @@ impl Screen {
                 let ximg = xscreen - self.pos.0;
                 let yimg = yscreen - self.pos.1;
 
-                let idx = yimg * size.1 as i32 + ximg;
-                let rgba = image_buf[idx as usize];
+                let idx = yimg * size.1 + ximg;
+                let rgba = image_buf[idx];
 
                 pixel.copy_from_slice(&rgba);
             }
@@ -226,18 +225,18 @@ impl Screen {
     where
         S: Drawable,
     {
-        assert!(dest.x + sprite.width() as i32 <= WIDTH);
-        assert!(dest.y + sprite.height() as i32 <= HEIGHT);
+        assert!(dest.x + sprite.width() <= WIDTH);
+        assert!(dest.y + sprite.height() <= HEIGHT);
 
         let pixels = sprite.pixels();
         let width = sprite.width() * 4;
 
         let mut s = 0;
         for y in 0..sprite.height() {
-            let i = dest.x * 4 + dest.y * WIDTH * 4 + y as i32 * WIDTH * 4;
+            let i = dest.x * 4 + dest.y * WIDTH * 4 + y * WIDTH * 4;
 
             // Merge pixels from sprite into screen
-            let zipped = screen[i as usize..i as usize + width]
+            let zipped = screen[i..i + width]
                 .iter_mut()
                 .zip(&pixels[s..s + width]);
             for (left, &right) in zipped {

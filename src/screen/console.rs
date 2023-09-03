@@ -49,8 +49,7 @@ label
 
 */
 
-use crate::{colors, map, World, WIDTH};
-use rltk::Point;
+use crate::{colors, map, World, WIDTH, Point};
 
 #[derive(Debug)]
 pub enum ConsoleMode {
@@ -61,8 +60,8 @@ pub enum ConsoleMode {
 
 #[derive(Debug)]
 pub struct Console {
-    pub size: (i32, i32),
-    pub pos: (i32, i32),
+    pub size: (usize, usize),
+    pub pos: (usize, usize),
     pub children: Vec<Console>,
     pub hidden: bool,
     pub z: i32, // not used yet
@@ -71,7 +70,7 @@ pub struct Console {
 }
 
 impl Console {
-    pub fn new(size: (i32, i32), pos: (i32, i32), mode: ConsoleMode) -> Console {
+    pub fn new(size: (usize, usize), pos: (usize, usize), mode: ConsoleMode) -> Console {
         Self {
             size: size,
             pos: pos,
@@ -119,15 +118,15 @@ impl Console {
 
                 if zoom < 8 {
                     for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                        let xscreen = (i % WIDTH as usize) as i32;
-                        let yscreen = (i / WIDTH as usize) as i32;
+                        let xscreen = i % WIDTH;
+                        let yscreen = i / WIDTH;
     
                         let xrange = self.pos.0..self.pos.0 + self.size.0;
                         let yrange = self.pos.1..self.pos.1 + self.size.1;
     
                         if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                            let xmap = (xscreen - self.pos.0) / zoom as i32;
-                            let ymap = (yscreen - self.pos.1) / zoom as i32;
+                            let xmap = (xscreen - self.pos.0) / zoom;
+                            let ymap = (yscreen - self.pos.1) / zoom;
     
                             let idx = map.xy_idx((xmap, ymap));
                             let rgba = match map.tiles[idx] {
@@ -141,22 +140,22 @@ impl Console {
                         }
                     }
                 } else {
-                    let widthchars = self.size.0 / zoom as i32;
-                    let heightchars = self.size.1 / zoom as i32;
+                    let widthchars = self.size.0 / zoom;
+                    let heightchars = self.size.1 / zoom;
     
                     for x in 0..widthchars {
                         for y in 0..heightchars {
                             // todo check bounds
-                            if x < self.pos.0 + self.size.0 + zoom as i32
-                                && y < self.pos.1 + self.size.1 + zoom as i32
+                            if x < self.pos.0 + self.size.0 + zoom
+                                && y < self.pos.1 + self.size.1 + zoom
                             {
                                 screen.print_char(
                                     &world.assets,
                                     frame,
                                     map.get_glyph(Point { x, y }),
                                     Point {
-                                        x: self.pos.0 + x * zoom as i32,
-                                        y: self.pos.1 + y * zoom as i32,
+                                        x: self.pos.0 + x * zoom,
+                                        y: self.pos.1 + y * zoom,
                                     },
                                 );
                             }

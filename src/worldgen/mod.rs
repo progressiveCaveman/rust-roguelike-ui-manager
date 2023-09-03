@@ -3,9 +3,8 @@ pub mod world;
 use std::vec;
 
 use rand::Rng;
-use rltk::Point;
 
-use crate::map::{Map, TileType};
+use crate::{map::{Map, TileType}, Point};
 
 pub fn basic_fill(map: &mut Map) {
     let size = map.size;
@@ -61,11 +60,11 @@ fn fill_recursive(map: &mut Map, depth: i32) {
     }
 }
 
-fn rnd_point(size: (i32, i32)) -> (i32, i32) {
+fn rnd_point(size: (usize, usize)) -> (usize, usize) {
     let mut rng = rand::thread_rng();
     let x: f32 = rng.gen();
     let y: f32 = rng.gen();
-    ((x * size.0 as f32) as i32, (y * size.1 as f32) as i32)
+    ((x * size.0 as f32) as usize, (y * size.1 as f32) as usize)
 }
 
 pub fn get_neighbors(point: Point) -> Vec<Point> {
