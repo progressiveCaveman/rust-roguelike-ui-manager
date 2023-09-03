@@ -2,6 +2,7 @@
 // tcod-sys/libtcod/include/libtcod_int.h
 pub type Color = [u8; 4];
 
+pub const COLOR_CLEAR: Color = [0, 0, 0, 0];
 pub const COLOR_BLACK: Color = [0, 0, 0, 255];
 pub const COLOR_DARKEST_GREY: Color = [31, 31, 31, 255];
 pub const COLOR_DARKER_GREY: Color = [63, 63, 63, 255];

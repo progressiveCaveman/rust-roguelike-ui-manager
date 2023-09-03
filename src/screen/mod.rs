@@ -1,6 +1,6 @@
 use crate::{
     assets::{
-        cp437_converter::{string_to_cp437, to_cp437, FontCharType},
+        cp437_converter::string_to_cp437,
         sprites::Drawable,
         Assets,
     },
@@ -20,8 +20,10 @@ pub struct Screen {
     consoles: Vec<Console>,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Glyph {
     pub pos: Point,
+    pub ch: usize,
     pub fg: Color,
     pub bg: Color,
 }
@@ -78,14 +80,9 @@ impl Screen {
         }
     }
 
-    pub fn print_char(&self, assets: &Assets, frame: &mut [u8], ch: char, pos: Point) {
-        let sprite = &assets.cp437[to_cp437(ch) as usize];
-        Screen::blit(frame, &pos, sprite);
-    }
-
-    pub fn print_cp437(&self, assets: &Assets, frame: &mut [u8], ch: FontCharType, pos: Point) {
-        let sprite = &assets.cp437[ch as usize];
-        Screen::blit(frame, &pos, sprite);
+    pub fn print_cp437(&self, assets: &Assets, frame: &mut [u8], glyph: Glyph) {
+        let sprite = &assets.glyph(glyph);
+        Screen::blit(frame, glyph.pos, sprite);
     }
 
     pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: Point) {
@@ -96,7 +93,7 @@ impl Screen {
             let sprite = &assets.cp437[*ch as usize];
             Screen::blit(
                 frame,
-                &Point {
+                Point {
                     x: pos.x + idx * 8,
                     y: pos.y,
                 },
@@ -105,7 +102,7 @@ impl Screen {
         }
     }
 
-    pub fn draw_box(&self, assets: &Assets, frame: &mut [u8], pos: Point, size: Point) {
+    pub fn draw_box(&self, assets: &Assets, frame: &mut [u8], pos: Point, size: Point, fg: Color, bg: Color) {
         let vertwall = 186;
         let horizwall = 205;
         let nwcorner = 201;
@@ -113,45 +110,73 @@ impl Screen {
         let secorner = 188;
         let swcorner = 200;
 
-        self.print_cp437(assets, frame, nwcorner, pos);
+        self.print_cp437(assets, frame, Glyph { pos: pos, ch: nwcorner, fg, bg });
         self.print_cp437(
             assets,
             frame,
-            necorner,
-            Point {
-                x: pos.x + size.x,
-                y: pos.y,
-            },
+            Glyph { 
+                pos: Point {
+                    x: pos.x + size.x,
+                    y: pos.y,
+                }, 
+                ch: necorner, 
+                fg, 
+                bg 
+            }
         );
         self.print_cp437(
             assets,
             frame,
-            swcorner,
-            Point {
-                x: pos.x + size.x,
-                y: pos.y + size.y,
-            },
+            Glyph { 
+                pos: Point {
+                    x: pos.x + size.x,
+                    y: pos.y + size.y,
+                }, 
+                ch: swcorner, 
+                fg, 
+                bg 
+            }
         );
         self.print_cp437(
             assets,
             frame,
-            secorner,
-            Point {
-                x: pos.x,
-                y: pos.y + size.y,
-            },
+            Glyph { 
+                pos: Point {
+                    x: pos.x,
+                    y: pos.y + size.y,
+                }, 
+                ch: secorner, 
+                fg, 
+                bg 
+            }
         );
 
         for x in pos.x + 1..pos.x + size.x {
-            self.print_cp437(assets, frame, horizwall, Point { x: x, y: pos.y });
+            self.print_cp437(
+                assets, 
+                frame, 
+                Glyph { 
+                    pos: Point {
+                        x: x, 
+                        y: pos.y 
+                    }, 
+                    ch: horizwall, 
+                    fg, 
+                    bg 
+                }
+            );
             self.print_cp437(
                 assets,
                 frame,
-                horizwall,
-                Point {
-                    x: x,
-                    y: pos.y + size.y,
-                },
+                Glyph { 
+                    pos: Point {
+                        x: x,
+                        y: pos.y + size.y,
+                    }, 
+                    ch: horizwall, 
+                    fg, 
+                    bg 
+                }
             );
         }
 
@@ -159,13 +184,29 @@ impl Screen {
             self.print_cp437(
                 assets,
                 frame,
-                vertwall,
-                Point {
-                    x: pos.x + size.x,
-                    y: y,
-                },
+                Glyph { 
+                    pos: Point {
+                        x: pos.x + size.x,
+                        y: y,
+                    }, 
+                    ch: vertwall, 
+                    fg, 
+                    bg 
+                }
             );
-            self.print_cp437(assets, frame, vertwall, Point { x: pos.x, y: y });
+            self.print_cp437(
+                assets, 
+                frame, 
+                Glyph { 
+                    pos: Point {
+                        x: pos.x, 
+                        y: y
+                    }, 
+                    ch: vertwall, 
+                    fg, 
+                    bg 
+                }
+            );
         }
 
         // if x < 1 || x > map.width-2 || y < 1 || y > map.height-2 as i32 { return 35; }
@@ -221,7 +262,7 @@ impl Screen {
     }
 
     /// Blit a drawable to the pixel buffer.
-    pub fn blit<S>(screen: &mut [u8], dest: &Point, sprite: &S)
+    pub fn blit<S>(screen: &mut [u8], dest: Point, sprite: &S)
     where
         S: Drawable,
     {

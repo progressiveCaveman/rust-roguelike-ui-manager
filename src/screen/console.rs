@@ -49,7 +49,9 @@ label
 
 */
 
-use crate::{colors, map, World, WIDTH, Point};
+use crate::{colors, map, World, WIDTH, Point, assets::cp437_converter::to_cp437};
+
+use super::Glyph;
 
 #[derive(Debug)]
 pub enum ConsoleMode {
@@ -102,6 +104,8 @@ impl Console {
                         x: 12 * 8,
                         y: 2 * 8,
                     },
+                    colors::COLOR_WHITE,
+                    colors::COLOR_CLEAR
                 );
                 screen.print_string(
                     &world.assets,
@@ -146,17 +150,26 @@ impl Console {
                     for x in 0..widthchars {
                         for y in 0..heightchars {
                             // todo check bounds
-                            if x < self.pos.0 + self.size.0 + zoom
-                                && y < self.pos.1 + self.size.1 + zoom
-                            {
-                                screen.print_char(
+                            if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom {
+                                let idx = map.xy_idx((x, y));
+                                let rgba = match map.tiles[idx] {
+                                    map::TileType::Water => colors::COLOR_DARK_BLUE,
+                                    map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
+                                    map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
+                                    map::TileType::Stone => colors::COLOR_GREY,
+                                };
+                                screen.print_cp437(
                                     &world.assets,
                                     frame,
-                                    map.get_glyph(Point { x, y }),
-                                    Point {
-                                        x: self.pos.0 + x * zoom,
-                                        y: self.pos.1 + y * zoom,
-                                    },
+                                    Glyph {
+                                        pos: Point {
+                                            x: self.pos.0 + x * zoom,
+                                            y: self.pos.1 + y * zoom,
+                                        },
+                                        ch: to_cp437(map.get_glyph(Point { x, y })),
+                                        fg: rgba,
+                                        bg: colors::COLOR_CLEAR,
+                                    }
                                 );
                             }
                         }
@@ -175,6 +188,8 @@ impl Console {
                         x: self.size.0 - 8,
                         y: self.size.1 - 8,
                     },
+                    colors::COLOR_WHITE,
+                    colors::COLOR_CLEAR
                 );
             }
         }

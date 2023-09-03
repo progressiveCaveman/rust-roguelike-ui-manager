@@ -1,7 +1,7 @@
 use winit::event::VirtualKeyCode;
 use winit_input_helper::WinitInputHelper;
 
-use crate::World;
+use crate::{World, worldgen::basic_fill};
 
 pub enum Action {
     None,
@@ -9,7 +9,7 @@ pub enum Action {
 }
 
 pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
-    // Esc
+    // Esc : Exit
     if input.key_pressed(VirtualKeyCode::Escape) {
         return Action::Exit;
     }
@@ -24,14 +24,19 @@ pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
     //     }
     // }
 
-    // +
+    // + : zoom in
     if input.key_pressed(VirtualKeyCode::Equals) {
         world.screen.increment_zoom();
     }
 
-    // -
+    // - : zoom out
     if input.key_pressed(VirtualKeyCode::Minus) {
         world.screen.decrement_zoom();
+    }
+
+    // R : refresh worldgen
+    if input.key_pressed(VirtualKeyCode::R) {
+        basic_fill(&mut world.map);
     }
 
     return Action::None;

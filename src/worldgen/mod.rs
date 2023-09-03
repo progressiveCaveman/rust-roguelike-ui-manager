@@ -9,6 +9,10 @@ use crate::{map::{Map, TileType}, Point};
 pub fn basic_fill(map: &mut Map) {
     let size = map.size;
 
+    for i in 0..map.tiles.len() {
+        map.tiles[i] = TileType::Water;
+    }
+
     for i in 0..9 {
         let start1 = map.xy_idx(rnd_point(size));
         if i % 3 == 0 {

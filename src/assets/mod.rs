@@ -1,6 +1,8 @@
 use image::GenericImageView;
 use image::{self};
 
+use crate::screen::Glyph;
+
 use self::sprites::Sprite;
 
 pub mod cp437_converter;
@@ -15,7 +17,7 @@ pub struct Assets {
 
 impl Assets {
     pub fn new() -> Assets {
-        let img = image::open("res/terminal8x8.jpg").expect("File not found!");
+        let img = image::open("res/RDE_8x8.png").expect("File not found!");
 
         let empty_glyph = Sprite {
             width: GLYPH_SIZE,
@@ -40,5 +42,9 @@ impl Assets {
         }
 
         Assets { cp437: cp }
+    }
+
+    pub fn glyph(&self, glyph: Glyph) -> Sprite {
+        self.cp437[glyph.ch as usize].with_color(glyph.bg, glyph.fg)
     }
 }
