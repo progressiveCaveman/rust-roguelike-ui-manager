@@ -45,6 +45,7 @@ impl Assets {
     }
 
     pub fn glyph(&self, glyph: Glyph) -> Sprite {
+        dbg!("WARNING: very slow");
         self.cp437[glyph.ch as usize].with_color(glyph.bg, glyph.fg)
     }
 }

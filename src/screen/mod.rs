@@ -1,10 +1,12 @@
+use std::iter::zip;
+
 use crate::{
     assets::{
         cp437_converter::string_to_cp437,
         sprites::Drawable,
         Assets,
     },
-    Image, World, HEIGHT, WIDTH, colors::Color, Point,
+    Image, World, HEIGHT, WIDTH, colors::{Color, self}, Point,
 };
 
 use self::console::{Console, ConsoleMode};
@@ -81,8 +83,8 @@ impl Screen {
     }
 
     pub fn print_cp437(&self, assets: &Assets, frame: &mut [u8], glyph: Glyph) {
-        let sprite = &assets.glyph(glyph);
-        Screen::blit(frame, glyph.pos, sprite);
+        // let sprite = &assets.glyph(glyph);
+        Screen::blit_glyph(frame, assets, glyph.pos, glyph);
     }
 
     pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: Point) {
@@ -90,15 +92,24 @@ impl Screen {
         let chars = string_to_cp437(str);
 
         for (idx, ch) in chars.iter().enumerate() {
-            let sprite = &assets.cp437[*ch as usize];
-            Screen::blit(
-                frame,
-                Point {
+            self.print_cp437(assets, frame, Glyph { 
+                pos: Point {
                     x: pos.x + idx * 8,
                     y: pos.y,
                 },
-                sprite,
-            );
+                ch: *ch, 
+                fg: colors::COLOR_WHITE, 
+                bg: colors::COLOR_CLEAR 
+            });
+            // let sprite = &assets.cp437[*ch as usize];
+            // Screen::blit(
+            //     frame,
+            //     Point {
+            //         x: pos.x + idx * 8,
+            //         y: pos.y,
+            //     },
+            //     sprite,
+            // );
         }
     }
 
@@ -261,11 +272,10 @@ impl Screen {
         }
     }
 
-    /// Blit a drawable to the pixel buffer.
-    pub fn blit<S>(screen: &mut [u8], dest: Point, sprite: &S)
-    where
-        S: Drawable,
-    {
+    /// Blit a drawable to the pixel buffer. Assumes glyph asset has fuscia bg and grayscale fg
+    pub fn blit_glyph(screen: &mut [u8], assets: &Assets, dest: Point, glyph: Glyph) {
+        let sprite = &assets.cp437[glyph.ch as usize];//&assets.glyph(glyph);
+
         assert!(dest.x + sprite.width() <= WIDTH);
         assert!(dest.y + sprite.height() <= HEIGHT);
 
@@ -276,15 +286,20 @@ impl Screen {
         for y in 0..sprite.height() {
             let i = dest.x * 4 + dest.y * WIDTH * 4 + y * WIDTH * 4;
 
-            // Merge pixels from sprite into screen
-            let zipped = screen[i..i + width]
-                .iter_mut()
-                .zip(&pixels[s..s + width]);
-            for (left, &right) in zipped {
-                if right > 0 {
-                    *left = right;
+            let zipped = zip(
+                screen[i..i + width].chunks_exact_mut(4),
+                pixels[s..s + width].chunks_exact(4),
+            );
+
+            for (left, right) in zipped {
+                // set color
+                for i2 in 0..4 {
+                    if right == colors::COLOR_FUCHSIA { // background
+                        left[i2] = glyph.bg[i2];
+                    } else { // foreground
+                        left[i2] = (right[i2] as f32 * glyph.fg[i2] as f32 / 255 as f32) as u8;
+                    }
                 }
-                // *left = right;
             }
 
             s += width;
