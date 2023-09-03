@@ -117,78 +117,52 @@ impl Console {
             ConsoleMode::WorldMap => {
                 let zoom = self.zoom; // each tile takes up zoom x zoom pixels
 
-                for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                    let xscreen = (i % WIDTH as usize) as i32;
-                    let yscreen = (i / WIDTH as usize) as i32;
-
-                    let xrange = self.pos.0..self.pos.0 + self.size.0;
-                    let yrange = self.pos.1..self.pos.1 + self.size.1;
-
-                    if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                        let xmap = (xscreen - self.pos.0) / zoom as i32;
-                        let ymap = (yscreen - self.pos.1) / zoom as i32;
-
-                        let idx = map.xy_idx((xmap, ymap));
-                        let rgba = match map.tiles[idx] {
-                            map::TileType::Water => colors::COLOR_DARK_BLUE,
-                            map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                            map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                            map::TileType::Stone => colors::COLOR_GREY,
-                        };
-
-                        pixel.copy_from_slice(&rgba);
+                if zoom < 8 {
+                    for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+                        let xscreen = (i % WIDTH as usize) as i32;
+                        let yscreen = (i / WIDTH as usize) as i32;
+    
+                        let xrange = self.pos.0..self.pos.0 + self.size.0;
+                        let yrange = self.pos.1..self.pos.1 + self.size.1;
+    
+                        if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
+                            let xmap = (xscreen - self.pos.0) / zoom as i32;
+                            let ymap = (yscreen - self.pos.1) / zoom as i32;
+    
+                            let idx = map.xy_idx((xmap, ymap));
+                            let rgba = match map.tiles[idx] {
+                                map::TileType::Water => colors::COLOR_DARK_BLUE,
+                                map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
+                                map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
+                                map::TileType::Stone => colors::COLOR_GREY,
+                            };
+    
+                            pixel.copy_from_slice(&rgba);
+                        }
+                    }
+                } else {
+                    let widthchars = self.size.0 / zoom as i32;
+                    let heightchars = self.size.1 / zoom as i32;
+    
+                    for x in 0..widthchars {
+                        for y in 0..heightchars {
+                            // todo check bounds
+                            if x < self.pos.0 + self.size.0 + zoom as i32
+                                && y < self.pos.1 + self.size.1 + zoom as i32
+                            {
+                                screen.print_char(
+                                    &world.assets,
+                                    frame,
+                                    map.get_glyph(Point { x, y }),
+                                    Point {
+                                        x: self.pos.0 + x * zoom as i32,
+                                        y: self.pos.1 + y * zoom as i32,
+                                    },
+                                );
+                            }
+                        }
                     }
                 }
-
-
-
-
-                // if zoom == 0 {
-                //     for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                //         let xscreen = (i % WIDTH as usize) as i32;
-                //         let yscreen = (i / WIDTH as usize) as i32;
-    
-                //         let xrange = self.pos.0..self.pos.0 + self.size.0;
-                //         let yrange = self.pos.1..self.pos.1 + self.size.1;
-    
-                //         if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                //             let xmap = xscreen - self.pos.0;
-                //             let ymap = yscreen - self.pos.1;
-    
-                //             let idx = map.xy_idx((xmap, ymap));
-                //             let rgba = match map.tiles[idx] {
-                //                 map::TileType::Water => colors::COLOR_DARK_BLUE,
-                //                 map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                //                 map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                //                 map::TileType::Stone => colors::COLOR_GREY,
-                //             };
-    
-                //             pixel.copy_from_slice(&rgba);
-                //         }
-                //     }
-                // } else {
-                //     let widthchars = self.size.0 / gsize;
-                //     let heightchars = self.size.1 / gsize;
-    
-                //     for x in 0..widthchars {
-                //         for y in 0..heightchars {
-                //             // todo check bounds
-                //             if x < self.pos.0 + self.size.0 + gsize
-                //                 && y < self.pos.1 + self.size.1 + gsize
-                //             {
-                //                 screen.print_char(
-                //                     &world.assets,
-                //                     frame,
-                //                     map.get_glyph(Point { x, y }),
-                //                     Point {
-                //                         x: self.pos.0 + x * gsize,
-                //                         y: self.pos.1 + y * gsize,
-                //                     },
-                //                 );
-                //             }
-                //         }
-                //     }
-                // }
             }
             ConsoleMode::Log => {
                 screen.draw_box(

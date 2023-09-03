@@ -12,7 +12,7 @@ use self::console::{Console, ConsoleMode};
 
 pub mod console;
 
-const MAX_ZOOM: usize = 7;
+const MAX_ZOOM: usize = 8;
 
 pub struct Screen {
     pub size: (i32, i32),
