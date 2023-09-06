@@ -7,7 +7,7 @@ use pixels::{Error, Pixels, SurfaceTexture};
 
 use screen::Screen;
 use winit::dpi::LogicalSize;
-use winit::event::Event;
+use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
@@ -129,7 +129,7 @@ fn main() -> Result<(), Error> {
         // Handle input events
         if input.update(&event) {
             // Close events
-            if input.close_requested() {
+            if input.close_requested() || input.key_pressed(VirtualKeyCode::Escape) {
                 *control_flow = ControlFlow::Exit;
                 return;
             }

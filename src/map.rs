@@ -1,9 +1,7 @@
-use serde::{Deserialize, Serialize};
-use shipyard::Unique;
 
 use crate::Point;
 
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Debug)]
 pub enum TileType {
     Water,
     Sand,
@@ -11,7 +9,7 @@ pub enum TileType {
     Stone,
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Unique)]
+#[derive(Default, Clone)]
 pub struct Map {
     pub tiles: Vec<TileType>,
     pub size: (usize, usize),

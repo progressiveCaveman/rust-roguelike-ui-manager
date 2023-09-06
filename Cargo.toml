@@ -7,12 +7,7 @@ edition = "2021"
 
 [dependencies]
 num_enum = "0.5.1"
-rltk = { version = "0.8.7", features = ["serde"] }
-serde = { version = "1.0.125", features = ["derive"] }
-serde_json = "1.0.64"
 rand = "0.8.5"
-lazy_static = "1.4.0"
-shipyard = "0.6.2"
 env_logger = "0.10"
 error-iter = "0.4"
 log = "0.4"
