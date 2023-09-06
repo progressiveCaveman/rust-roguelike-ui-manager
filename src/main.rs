@@ -7,7 +7,7 @@ use pixels::{Error, Pixels, SurfaceTexture};
 
 use screen::Screen;
 use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode};
+use winit::event::{Event, VirtualKeyCode, ElementState, WindowEvent, ModifiersState};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
@@ -37,6 +37,12 @@ pub struct Point {
     pub y: usize,
 }
 
+impl Point {
+    pub fn tuple(&self) -> (usize, usize) {
+        (self.x, self.y)
+    }
+}
+
 pub struct World {
     pub map: Map,
     pub screen: Screen,
@@ -49,7 +55,7 @@ impl World {
     fn new() -> Self {
         Self {
             map: Map::new(map::TileType::Water, (WIDTH, HEIGHT)),
-            screen: Screen::new((WIDTH, HEIGHT), (0, 0)),
+            screen: Screen::new((WIDTH, HEIGHT)),
             assets: Assets::new(),
             tick: 0,
             image: (Vec::new(), (0, 0)),

@@ -135,25 +135,32 @@ impl Console {
                             let ymap = self.map_pos.1 + (yscreen - self.pos.1) / zoom;
     
                             let idx = map.xy_idx((xmap, ymap));
-                            let rgba = match map.tiles[idx] {
-                                map::TileType::Water => colors::COLOR_DARK_BLUE,
-                                map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                                map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                                map::TileType::Stone => colors::COLOR_GREY,
-                            };
-    
-                            pixel.copy_from_slice(&rgba);
+
+                            if map.in_bounds((xmap, ymap)) { 
+
+                                let rgba = match map.tiles[idx] {
+                                    map::TileType::Water => colors::COLOR_DARK_BLUE,
+                                    map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
+                                    map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
+                                    map::TileType::Stone => colors::COLOR_GREY,
+                                };
+        
+                                pixel.copy_from_slice(&rgba);
+                            }
                         }
                     }
                 } else {
                     let widthchars = self.size.0 / zoom;
                     let heightchars = self.size.1 / zoom;
     
-                    for x in 0..widthchars {
-                        for y in 0..heightchars {
-                            // todo check bounds
-                            if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom {
-                                let idx = map.xy_idx((x, y));
+                    for x in 0 .. widthchars {
+                        for y in 0 .. heightchars {
+                            let point = Point {
+                                x: x + self.map_pos.0,
+                                y: y + self.map_pos.1,
+                            };
+                            let idx = map.point_idx(point);
+                            if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(point.tuple()){
                                 let rgba = match map.tiles[idx] {
                                     map::TileType::Water => colors::COLOR_DARK_BLUE,
                                     map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
@@ -168,7 +175,7 @@ impl Console {
                                             x: self.pos.0 + x * zoom,
                                             y: self.pos.1 + y * zoom,
                                         },
-                                        ch: to_cp437(map.get_glyph(Point { x, y })),
+                                        ch: to_cp437(map.get_glyph(point)),
                                         fg: rgba,
                                         bg: rgba.scale(0.5),
                                     }

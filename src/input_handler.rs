@@ -25,38 +25,44 @@ pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
     // }
 
     // + : zoom in
-    if input.key_pressed(VirtualKeyCode::Equals) {
+    if input.key_pressed_os(VirtualKeyCode::Equals) {
         world.screen.increment_zoom();
     }
 
     // - : zoom out
-    if input.key_pressed(VirtualKeyCode::Minus) {
+    if input.key_pressed_os(VirtualKeyCode::Minus) {
         world.screen.decrement_zoom();
     }
 
     // R : refresh worldgen
-    if input.key_pressed(VirtualKeyCode::R) {
+    if input.key_pressed_os(VirtualKeyCode::R) {
         basic_fill(&mut world.map);
     }
 
+    let movemod = if input.held_shift() {
+        10
+    } else {
+        1
+    };
+
     // Up : pan map
-    if input.key_pressed(VirtualKeyCode::Up) {
-        world.screen.pan_map((0, -1));
+    if input.key_pressed_os(VirtualKeyCode::Up) {
+        world.screen.pan_map((0, -1 * movemod));
     }
 
     // Down : pan map
-    if input.key_pressed(VirtualKeyCode::Down) {
-        world.screen.pan_map((0, 1));
+    if input.key_pressed_os(VirtualKeyCode::Down) {
+        world.screen.pan_map((0, 1 * movemod));
     }
 
     // Left : pan map
-    if input.key_pressed(VirtualKeyCode::Left) {
-        world.screen.pan_map((-1, 0));
+    if input.key_pressed_os(VirtualKeyCode::Left) {
+        world.screen.pan_map((-1 * movemod, 0));
     }
 
     // Right : pan map
-    if input.key_pressed(VirtualKeyCode::Right) {
-        world.screen.pan_map((1, 0));
+    if input.key_pressed_os(VirtualKeyCode::Right) {
+        world.screen.pan_map((1 * movemod, 0));
     }
 
     return Action::None;

@@ -17,7 +17,6 @@ const MAX_ZOOM: usize = 8;
 
 pub struct Screen {
     pub size: (usize, usize),
-    pub pos: (usize, usize),
     pub input_blocking: bool,
     consoles: Vec<Console>,
 }
@@ -32,10 +31,9 @@ pub struct Glyph {
 
 impl Screen {
     /// Create a new `World` instance that can draw a moving box.
-    pub fn new(size: (usize, usize), pos: (usize, usize)) -> Self {
+    pub fn new(size: (usize, usize)) -> Self {
         Self {
             size,
-            pos,
             input_blocking: false,
             consoles: Vec::new(),
         }
@@ -265,7 +263,7 @@ impl Screen {
         // }
     }
 
-    pub fn draw_image(&self, image: &Image, frame: &mut [u8], pos: Point) {
+    pub fn draw_image(&self, image: &Image, frame: &mut [u8], pos: (usize, usize)) {
         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
             let image_buf = &image.0;
             let size = image.1;
@@ -273,12 +271,12 @@ impl Screen {
             let xscreen = i % WIDTH;
             let yscreen = i / WIDTH;
 
-            let xrange = self.pos.0..self.pos.0 + self.size.0;
-            let yrange = self.pos.1..self.pos.1 + self.size.1;
+            let xrange = pos.0 .. pos.0 + self.size.0;
+            let yrange = pos.1 .. pos.1 + self.size.1;
 
             if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                let ximg = xscreen - self.pos.0;
-                let yimg = yscreen - self.pos.1;
+                let ximg = xscreen - pos.0;
+                let yimg = yscreen - pos.1;
 
                 let idx = yimg * size.1 + ximg;
                 let rgba = image_buf[idx];
