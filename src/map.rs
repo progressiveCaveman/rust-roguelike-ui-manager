@@ -1,6 +1,4 @@
 
-use crate::Point;
-
 #[derive(PartialEq, Copy, Clone, Debug)]
 pub enum TileType {
     Water,
@@ -24,6 +22,15 @@ impl Map {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.size.0 * self.size.1
+    }
+
+    pub fn get_tile(&self, xy: (usize, usize)) -> TileType {
+        let idx = self.xy_idx(xy);
+        self.tiles[idx]
+    }
+
     pub fn set_tile(&mut self, xy: (usize, usize), value: TileType) {
         let idx = self.xy_idx(xy);
         self.tiles[idx] = value;
@@ -33,34 +40,23 @@ impl Map {
         (xy.1 as usize * self.size.0 as usize) + xy.0 as usize
     }
 
-    pub fn point_idx(&self, point: Point) -> usize {
-        (point.y as usize * self.size.0 as usize) + point.x as usize
-    }
-
     pub fn idx_xy(&self, idx: usize) -> (usize, usize) {
         (idx as usize % self.size.0, idx as usize / self.size.0)
     }
 
-    pub fn idx_point(&self, idx: usize) -> Point {
-        Point {
-            x: (idx as usize % self.size.0) as usize,
-            y: (idx as usize / self.size.0) as usize,
-        }
-    }
-
     pub fn in_bounds(&self, pos: (usize, usize)) -> bool {
-        pos.0 >= 0 && pos.0 < self.size.0 && pos.1 >= 0 && pos.1 < self.size.1
+        pos.0 < self.size.0 && pos.1 < self.size.1
     }
 
-    fn is_exit_valid(&self, x: usize, y: usize) -> bool {
-        if x < 1 || x >= self.size.0 || y < 1 || y >= self.size.1 {
-            return false;
-        }
-        return true;
-    }
+    // fn is_exit_valid(&self, x: usize, y: usize) -> bool {
+    //     if x < 1 || x >= self.size.0 || y < 1 || y >= self.size.1 {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
-    pub fn get_glyph(&self, p: Point) -> char {
-        match self.tiles[self.point_idx(p)] {
+    pub fn get_glyph(&self, p: (usize, usize)) -> char {
+        match self.tiles[self.xy_idx(p)] {
             TileType::Water => '~',
             TileType::Sand => '.',
             TileType::Dirt => '.',

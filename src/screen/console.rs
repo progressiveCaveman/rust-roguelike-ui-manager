@@ -49,7 +49,7 @@ label
 
 */
 
-use crate::{colors::{self, Scale}, map, World, WIDTH, Point, assets::cp437_converter::to_cp437};
+use crate::{colors::{self, Scale}, map, World, WIDTH, assets::cp437_converter::to_cp437};
 
 use super::Glyph;
 
@@ -98,14 +98,8 @@ impl Console {
                 screen.draw_box(
                     &world.assets,
                     frame,
-                    Point {
-                        x: self.pos.0 + self.size.0 * 1 / 3 - 8,
-                        y: self.pos.1 + self.size.1 / 2 - 4 - 8,
-                    },
-                    Point {
-                        x: 12 * 8,
-                        y: 2 * 8,
-                    },
+                    (self.pos.0 + self.size.0 * 1 / 3 - 8, self.pos.1 + self.size.1 / 2 - 4 - 8),
+                    (12 * 8, 2 * 8),
                     colors::COLOR_WHITE,
                     colors::COLOR_CLEAR
                 );
@@ -113,10 +107,7 @@ impl Console {
                     &world.assets,
                     frame,
                     "Hello World",
-                    Point {
-                        x: self.pos.0 + self.size.0 * 1 / 3,
-                        y: self.pos.1 + self.size.1 / 2 - 4,
-                    },
+                    (self.pos.0 + self.size.0 * 1 / 3, self.pos.1 + self.size.1 / 2 - 4),
                 );
             }
             ConsoleMode::WorldMap => {
@@ -133,12 +124,10 @@ impl Console {
                         if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
                             let xmap = self.map_pos.0 + (xscreen - self.pos.0) / zoom;
                             let ymap = self.map_pos.1 + (yscreen - self.pos.1) / zoom;
-    
-                            let idx = map.xy_idx((xmap, ymap));
 
                             if map.in_bounds((xmap, ymap)) { 
 
-                                let rgba = match map.tiles[idx] {
+                                let rgba = match map.get_tile((xmap, ymap)) {
                                     map::TileType::Water => colors::COLOR_DARK_BLUE,
                                     map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
                                     map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
@@ -155,13 +144,10 @@ impl Console {
     
                     for x in 0 .. widthchars {
                         for y in 0 .. heightchars {
-                            let point = Point {
-                                x: x + self.map_pos.0,
-                                y: y + self.map_pos.1,
-                            };
-                            let idx = map.point_idx(point);
-                            if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(point.tuple()){
-                                let rgba = match map.tiles[idx] {
+                            let pos = (x + self.map_pos.0, y + self.map_pos.1);
+                            // let idx = map.point_idx(point);
+                            if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(pos){
+                                let rgba = match map.get_tile(pos) {
                                     map::TileType::Water => colors::COLOR_DARK_BLUE,
                                     map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
                                     map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
@@ -171,11 +157,8 @@ impl Console {
                                     &world.assets,
                                     frame,
                                     Glyph {
-                                        pos: Point {
-                                            x: self.pos.0 + x * zoom,
-                                            y: self.pos.1 + y * zoom,
-                                        },
-                                        ch: to_cp437(map.get_glyph(point)),
+                                        pos: (self.pos.0 + x * zoom, self.pos.1 + y * zoom),
+                                        ch: to_cp437(map.get_glyph(pos)),
                                         fg: rgba,
                                         bg: rgba.scale(0.5),
                                     }
@@ -189,14 +172,8 @@ impl Console {
                 screen.draw_box(
                     &world.assets,
                     frame,
-                    Point {
-                        x: self.pos.0,
-                        y: self.pos.1,
-                    },
-                    Point {
-                        x: self.size.0 - 8,
-                        y: self.size.1 - 8,
-                    },
+                    (self.pos.0, self.pos.1),
+                    (self.size.0 - 8, self.size.1 - 8),
                     colors::COLOR_WHITE,
                     colors::COLOR_CLEAR
                 );

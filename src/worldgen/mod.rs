@@ -4,7 +4,7 @@ use std::vec;
 
 use rand::Rng;
 
-use crate::{map::{Map, TileType}, Point};
+use crate::map::{Map, TileType};
 
 pub fn basic_fill(map: &mut Map) {
     let size = map.size;
@@ -42,11 +42,11 @@ fn fill_recursive(map: &mut Map, depth: i32) {
         if tile == TileType::Water {
             water += 1;
 
-            let neighbors = get_neighbors(map.idx_point(index));
+            let neighbors = get_neighbors(map.idx_xy(index));
 
             for p in neighbors.iter() {
-                if map.in_bounds((p.x.try_into().unwrap(), p.y.try_into().unwrap())) {
-                    let idx = map.point_idx(*p);
+                if map.in_bounds((p.0.try_into().unwrap(), p.1.try_into().unwrap())) {
+                    let idx = map.xy_idx(*p);
                     let t = map.tiles[idx];
                     if t != TileType::Water {
                         new[index] = t;
@@ -71,39 +71,15 @@ fn rnd_point(size: (usize, usize)) -> (usize, usize) {
     ((x * size.0 as f32) as usize, (y * size.1 as f32) as usize)
 }
 
-pub fn get_neighbors(point: Point) -> Vec<Point> {
+pub fn get_neighbors(point: (usize, usize)) -> Vec<(usize, usize)> {
     vec![
-        Point {
-            x: point.x - 1,
-            y: point.y - 1,
-        },
-        Point {
-            x: point.x - 1,
-            y: point.y,
-        },
-        Point {
-            x: point.x - 1,
-            y: point.y + 1,
-        },
-        Point {
-            x: point.x,
-            y: point.y - 1,
-        },
-        Point {
-            x: point.x,
-            y: point.y + 1,
-        },
-        Point {
-            x: point.x + 1,
-            y: point.y - 1,
-        },
-        Point {
-            x: point.x + 1,
-            y: point.y,
-        },
-        Point {
-            x: point.x + 1,
-            y: point.y + 1,
-        },
+        (point.0 - 1,point.1 - 1,),
+        (point.0 - 1,point.1,),
+        (point.0 - 1,point.1 + 1,),
+        (point.0,point.1 - 1,),
+        (point.0,point.1 + 1,),
+        (point.0 + 1,point.1 - 1,),
+        (point.0 + 1,point.1,),
+        (point.0 + 1,point.1 + 1,),
     ]
 }

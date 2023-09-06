@@ -7,7 +7,7 @@ use pixels::{Error, Pixels, SurfaceTexture};
 
 use screen::Screen;
 use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode, ElementState, WindowEvent, ModifiersState};
+use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
@@ -27,21 +27,6 @@ const HEIGHT: usize = 480 * SCALE;
 // const HEIGHT: usize = 320;
 
 type Image = (Vec<[u8; 4]>, (usize, usize));
-
-
-#[derive(Debug, Clone, Copy)]
-pub struct Point {
-    /// The point's X location
-    pub x: usize,
-    /// The point's Y location
-    pub y: usize,
-}
-
-impl Point {
-    pub fn tuple(&self) -> (usize, usize) {
-        (self.x, self.y)
-    }
-}
 
 pub struct World {
     pub map: Map,

@@ -6,7 +6,7 @@ use crate::{
         sprites::Drawable,
         Assets,
     },
-    Image, World, HEIGHT, WIDTH, colors::{Color, self}, Point,
+    Image, World, HEIGHT, WIDTH, colors::{Color, self},
 };
 
 use self::console::{Console, ConsoleMode};
@@ -23,7 +23,7 @@ pub struct Screen {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Glyph {
-    pub pos: Point,
+    pub pos: (usize, usize),
     pub ch: usize,
     pub fg: Color,
     pub bg: Color,
@@ -101,16 +101,13 @@ impl Screen {
         Screen::blit_glyph(frame, assets, glyph.pos, glyph);
     }
 
-    pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: Point) {
+    pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: (usize, usize)) {
         // let str = "Hello world!";
         let chars = string_to_cp437(str);
 
         for (idx, ch) in chars.iter().enumerate() {
             self.print_cp437(assets, frame, Glyph { 
-                pos: Point {
-                    x: pos.x + idx * 8,
-                    y: pos.y,
-                },
+                pos: (pos.0 + idx * 8, pos.1),
                 ch: *ch, 
                 fg: colors::COLOR_WHITE, 
                 bg: colors::COLOR_CLEAR 
@@ -127,7 +124,7 @@ impl Screen {
         }
     }
 
-    pub fn draw_box(&self, assets: &Assets, frame: &mut [u8], pos: Point, size: Point, fg: Color, bg: Color) {
+    pub fn draw_box(&self, assets: &Assets, frame: &mut [u8], pos: (usize, usize), size: (usize, usize), fg: Color, bg: Color) {
         let vertwall = 186;
         let horizwall = 205;
         let nwcorner = 201;
@@ -140,10 +137,7 @@ impl Screen {
             assets,
             frame,
             Glyph { 
-                pos: Point {
-                    x: pos.x + size.x,
-                    y: pos.y,
-                }, 
+                pos: (pos.0 + size.0, pos.1), 
                 ch: necorner, 
                 fg, 
                 bg 
@@ -153,10 +147,7 @@ impl Screen {
             assets,
             frame,
             Glyph { 
-                pos: Point {
-                    x: pos.x + size.x,
-                    y: pos.y + size.y,
-                }, 
+                pos: (pos.0 + size.0, pos.1 + size.1),
                 ch: swcorner, 
                 fg, 
                 bg 
@@ -166,25 +157,19 @@ impl Screen {
             assets,
             frame,
             Glyph { 
-                pos: Point {
-                    x: pos.x,
-                    y: pos.y + size.y,
-                }, 
+                pos: (pos.0, pos.1 + size.1), 
                 ch: secorner, 
                 fg, 
                 bg 
             }
         );
 
-        for x in pos.x + 1..pos.x + size.x {
+        for x in pos.0 + 1..pos.0 + size.0 {
             self.print_cp437(
                 assets, 
                 frame, 
                 Glyph { 
-                    pos: Point {
-                        x: x, 
-                        y: pos.y 
-                    }, 
+                    pos: (x, pos.1),
                     ch: horizwall, 
                     fg, 
                     bg 
@@ -194,10 +179,7 @@ impl Screen {
                 assets,
                 frame,
                 Glyph { 
-                    pos: Point {
-                        x: x,
-                        y: pos.y + size.y,
-                    }, 
+                    pos: (x, pos.1 + size.1), 
                     ch: horizwall, 
                     fg, 
                     bg 
@@ -205,15 +187,12 @@ impl Screen {
             );
         }
 
-        for y in pos.y + 1..pos.y + size.y {
+        for y in pos.1 + 1..pos.1 + size.1 {
             self.print_cp437(
                 assets,
                 frame,
                 Glyph { 
-                    pos: Point {
-                        x: pos.x + size.x,
-                        y: y,
-                    }, 
+                    pos: (pos.0 + size.0, y), 
                     ch: vertwall, 
                     fg, 
                     bg 
@@ -223,10 +202,7 @@ impl Screen {
                 assets, 
                 frame, 
                 Glyph { 
-                    pos: Point {
-                        x: pos.x, 
-                        y: y
-                    }, 
+                    pos: (pos.0, y), 
                     ch: vertwall, 
                     fg, 
                     bg 
@@ -287,18 +263,18 @@ impl Screen {
     }
 
     /// Blit a drawable to the pixel buffer. Assumes glyph asset has fuscia bg and grayscale fg
-    pub fn blit_glyph(screen: &mut [u8], assets: &Assets, dest: Point, glyph: Glyph) {
+    pub fn blit_glyph(screen: &mut [u8], assets: &Assets, dest: (usize, usize), glyph: Glyph) {
         let sprite = &assets.cp437[glyph.ch as usize];//&assets.glyph(glyph);
 
-        assert!(dest.x + sprite.width() <= WIDTH);
-        assert!(dest.y + sprite.height() <= HEIGHT);
+        assert!(dest.0 + sprite.width() <= WIDTH);
+        assert!(dest.1 + sprite.height() <= HEIGHT);
 
         let pixels = sprite.pixels();
         let width = sprite.width() * 4;
 
         let mut s = 0;
         for y in 0..sprite.height() {
-            let i = dest.x * 4 + dest.y * WIDTH * 4 + y * WIDTH * 4;
+            let i = dest.0 * 4 + dest.1 * WIDTH * 4 + y * WIDTH * 4;
 
             let zipped = zip(
                 screen[i..i + width].chunks_exact_mut(4),
