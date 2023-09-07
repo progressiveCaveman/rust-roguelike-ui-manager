@@ -42,20 +42,26 @@ impl Screen {
     pub fn setup_consoles(&mut self) {
         let gsize = 8; // todo make this not magical
 
-        // log
+        // log console
         let x = 0;
         let y = 0;
         let w = self.size.0;
         let h = 10 * gsize;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::Log));
-        // let gsize = 8; // todo make this not magical
 
-        // main window
+        // main console
         let x = 0;
         let y = h;
         let w = w;
         let h = self.size.1 - h;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
+
+        // menu console
+        let x = 0;
+        let y = 0;
+        let w = self.size.0;
+        let h = self.size.1;
+        self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::MainMenu));
     }
 
     pub fn set_main_console_mode(&mut self, mode: ConsoleMode) {
@@ -92,7 +98,9 @@ impl Screen {
 
     pub fn draw(&self, frame: &mut [u8], world: &World) {
         for c in self.consoles.iter() {
-            c.render(frame, world);
+            if !c.hidden {
+                c.render(frame, world);
+            }
         }
     }
 
@@ -148,7 +156,7 @@ impl Screen {
             frame,
             Glyph { 
                 pos: (pos.0 + size.0, pos.1 + size.1),
-                ch: swcorner, 
+                ch: secorner, 
                 fg, 
                 bg 
             }
@@ -158,13 +166,13 @@ impl Screen {
             frame,
             Glyph { 
                 pos: (pos.0, pos.1 + size.1), 
-                ch: secorner, 
+                ch: swcorner, 
                 fg, 
                 bg 
             }
         );
 
-        for x in pos.0 + 1..pos.0 + size.0 {
+        for x in (pos.0 + 8 .. pos.0 + size.0 - 1).step_by(8) {
             self.print_cp437(
                 assets, 
                 frame, 
@@ -187,7 +195,7 @@ impl Screen {
             );
         }
 
-        for y in pos.1 + 1..pos.1 + size.1 {
+        for y in (pos.1 + 8 .. pos.1 + size.1 - 1).step_by(8) {
             self.print_cp437(
                 assets,
                 frame,
