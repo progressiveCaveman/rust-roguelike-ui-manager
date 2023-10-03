@@ -1,5 +1,3 @@
-pub mod world;
-
 use std::vec;
 
 use rand::Rng;
