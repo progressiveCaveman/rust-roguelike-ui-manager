@@ -15,10 +15,16 @@ pub mod console;
 
 const MAX_ZOOM: usize = 8;
 
+pub enum MenuState {
+    None,
+    MainMenu { selection: usize },
+}
+
 pub struct Screen {
     pub size: (usize, usize),
     pub input_blocking: bool,
     consoles: Vec<Console>,
+    pub menu_state: MenuState,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -36,6 +42,7 @@ impl Screen {
             size,
             input_blocking: false,
             consoles: Vec::new(),
+            menu_state: MenuState::None,
         }
     }
 
@@ -141,44 +148,19 @@ impl Screen {
         let swcorner = 200;
 
         self.print_cp437(assets, frame, Glyph { pos: pos, ch: nwcorner, fg, bg });
-        self.print_cp437(
-            assets,
-            frame,
-            Glyph { 
-                pos: (pos.0 + size.0, pos.1), 
-                ch: necorner, 
-                fg, 
-                bg 
-            }
-        );
-        self.print_cp437(
-            assets,
-            frame,
-            Glyph { 
-                pos: (pos.0 + size.0, pos.1 + size.1),
-                ch: secorner, 
-                fg, 
-                bg 
-            }
-        );
-        self.print_cp437(
-            assets,
-            frame,
-            Glyph { 
-                pos: (pos.0, pos.1 + size.1), 
-                ch: swcorner, 
-                fg, 
-                bg 
-            }
-        );
 
-        for x in (pos.0 + 8 .. pos.0 + size.0 - 1).step_by(8) {
+        for x in (pos.0 + 8 .. pos.0 + size.0 - 8).step_by(8) {
+            let (ch1, ch2) = if x > pos.0 + size.0 - 8 {
+                (necorner, secorner)
+            } else {
+                (horizwall, horizwall)
+            };
             self.print_cp437(
                 assets, 
                 frame, 
                 Glyph { 
                     pos: (x, pos.1),
-                    ch: horizwall, 
+                    ch: ch1, 
                     fg, 
                     bg 
                 }
@@ -187,31 +169,36 @@ impl Screen {
                 assets,
                 frame,
                 Glyph { 
-                    pos: (x, pos.1 + size.1), 
-                    ch: horizwall, 
+                    pos: (x, pos.1 + size.1 - 8), 
+                    ch: ch2, 
                     fg, 
                     bg 
                 }
             );
         }
 
-        for y in (pos.1 + 8 .. pos.1 + size.1 - 1).step_by(8) {
-            self.print_cp437(
-                assets,
-                frame,
-                Glyph { 
-                    pos: (pos.0 + size.0, y), 
-                    ch: vertwall, 
-                    fg, 
-                    bg 
-                }
-            );
+        for y in (pos.1 + 8 .. pos.1 + size.1 - 8).step_by(8) {
+            let (ch1, ch2) = if y > pos.1 + size.1 - 8 {
+                (swcorner, secorner)
+            } else {
+                (vertwall, vertwall)
+            };
             self.print_cp437(
                 assets, 
                 frame, 
                 Glyph { 
                     pos: (pos.0, y), 
-                    ch: vertwall, 
+                    ch: ch1, 
+                    fg, 
+                    bg 
+                }
+            );
+            self.print_cp437(
+                assets,
+                frame,
+                Glyph { 
+                    pos: (pos.0 + size.0 - 8, y), 
+                    ch: ch2, 
                     fg, 
                     bg 
                 }

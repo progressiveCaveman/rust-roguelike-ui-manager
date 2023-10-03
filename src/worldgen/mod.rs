@@ -72,14 +72,26 @@ fn rnd_point(size: (usize, usize)) -> (usize, usize) {
 }
 
 pub fn get_neighbors(point: (usize, usize)) -> Vec<(usize, usize)> {
-    vec![
-        (point.0 - 1,point.1 - 1,),
-        (point.0 - 1,point.1,),
-        (point.0 - 1,point.1 + 1,),
-        (point.0,point.1 - 1,),
-        (point.0,point.1 + 1,),
-        (point.0 + 1,point.1 - 1,),
-        (point.0 + 1,point.1,),
-        (point.0 + 1,point.1 + 1,),
-    ]
+    let mut n = vec![];
+
+    if point.0 > 0 {
+        n.push((point.0 - 1, point.1));
+        n.push((point.0 - 1, point.1 + 1));
+    }
+
+    if point.0 > 0 && point.1 > 0 {
+        n.push((point.0 - 1, point.1 - 1));
+    }
+
+    if point.1 > 0 {
+        n.push((point.0, point.1 - 1));
+        n.push((point.0 + 1, point.1 - 1));
+
+    }
+
+    n.push((point.0,point.1 + 1));
+    n.push((point.0 + 1,point.1));
+    n.push((point.0 + 1,point.1 + 1));
+
+    n
 }

@@ -67,9 +67,9 @@ pub struct Console {
     pub children: Vec<Console>,
     pub hidden: bool,
     pub z: i32, // not used yet
-    pub mode: ConsoleMode, //fns: destroy (with children)
-    pub zoom: usize, // Only used for map object
-    pub map_pos: (usize, usize), // Only used for map object
+    pub mode: ConsoleMode,
+    pub zoom: usize, // Only used for map mode
+    pub map_pos: (usize, usize), // Only used for map mode
 }
 
 impl Console {
@@ -89,12 +89,17 @@ impl Console {
     pub fn render(&self, frame: &mut [u8], world: &World) {
         let map = &world.map;
         let screen = &world.screen;
-        // let gsize = world.glyph_size;
-
-        // dbg!(&self.mode);
 
         match &self.mode {
             ConsoleMode::MainMenu => {
+                screen.draw_box(
+                    &world.assets,
+                    frame,
+                    self.pos,
+                    self.size,
+                    colors::COLOR_WHITE,
+                    colors::COLOR_BLACK
+                );
                 screen.draw_box(
                     &world.assets,
                     frame,
