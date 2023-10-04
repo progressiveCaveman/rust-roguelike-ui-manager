@@ -98,21 +98,14 @@ impl Console {
                     self.pos,
                     self.size,
                     colors::COLOR_WHITE,
-                    colors::COLOR_BLACK
-                );
-                screen.draw_box(
-                    &world.assets,
-                    frame,
-                    (self.pos.0 + self.size.0 * 1 / 3 - 8, self.pos.1 + self.size.1 / 2 - 4 - 8),
-                    (12 * 8, 2 * 8),
-                    colors::COLOR_WHITE,
-                    colors::COLOR_CLEAR
+                    colors::COLOR_BLACK_SEMI_TRANS
                 );
                 screen.print_string(
                     &world.assets,
                     frame,
                     "Hello World",
-                    (self.pos.0 + self.size.0 * 1 / 3, self.pos.1 + self.size.1 / 2 - 4),
+                    (self.pos.0 + 8, self.pos.1 + 8),
+                    // (self.pos.0 + self.size.0 / 2 - 11/2, self.pos.1 + self.size.1 / 2 - 4),
                 );
             }
             ConsoleMode::WorldMap => {

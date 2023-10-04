@@ -18,6 +18,7 @@ impl Scale for Color {
 
 pub const COLOR_CLEAR: Color = [0, 0, 0, 0];
 pub const COLOR_BLACK: Color = [0, 0, 0, 255];
+pub const COLOR_BLACK_SEMI_TRANS: Color = [0, 0, 0, 100];
 pub const COLOR_DARKEST_GREY: Color = [31, 31, 31, 255];
 pub const COLOR_DARKER_GREY: Color = [63, 63, 63, 255];
 pub const COLOR_DARK_GREY: Color = [95, 95, 95, 255];

@@ -64,10 +64,10 @@ impl Screen {
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
 
         // menu console
-        let x = 0;
-        let y = 0;
-        let w = self.size.0;
-        let h = self.size.1;
+        let w = 200;
+        let h = 104;
+        let x = self.size.0/2 - w/2;
+        let y = self.size.1/2 - h/2;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::MainMenu));
     }
 
@@ -147,62 +147,35 @@ impl Screen {
         let secorner = 188;
         let swcorner = 200;
 
-        self.print_cp437(assets, frame, Glyph { pos: pos, ch: nwcorner, fg, bg });
+        let gsize = 8;
 
-        for x in (pos.0 + 8 .. pos.0 + size.0 - 8).step_by(8) {
-            let (ch1, ch2) = if x > pos.0 + size.0 - 8 {
-                (necorner, secorner)
-            } else {
-                (horizwall, horizwall)
-            };
-            self.print_cp437(
-                assets, 
-                frame, 
-                Glyph { 
-                    pos: (x, pos.1),
-                    ch: ch1, 
-                    fg, 
-                    bg 
-                }
-            );
-            self.print_cp437(
-                assets,
-                frame,
-                Glyph { 
-                    pos: (x, pos.1 + size.1 - 8), 
-                    ch: ch2, 
-                    fg, 
-                    bg 
-                }
-            );
-        }
+        for x in (pos.0 .. pos.0 + size.0 - gsize).step_by(gsize) {
+            for y in (pos.1 .. pos.1 + size.1 - gsize).step_by(gsize) {
+                let mut ch = 0; // blank char
 
-        for y in (pos.1 + 8 .. pos.1 + size.1 - 8).step_by(8) {
-            let (ch1, ch2) = if y > pos.1 + size.1 - 8 {
-                (swcorner, secorner)
-            } else {
-                (vertwall, vertwall)
-            };
-            self.print_cp437(
-                assets, 
-                frame, 
-                Glyph { 
-                    pos: (pos.0, y), 
-                    ch: ch1, 
-                    fg, 
-                    bg 
-                }
-            );
-            self.print_cp437(
-                assets,
-                frame,
-                Glyph { 
-                    pos: (pos.0 + size.0 - 8, y), 
-                    ch: ch2, 
-                    fg, 
-                    bg 
-                }
-            );
+                let firstcolumn = x < pos.0 + gsize;
+                let lastcolumn = x > pos.0 + size.0 - 2*gsize - 1;
+                let firstrow = y < pos.1 + gsize;
+                let lastrow = y > pos.1 + size.1 - 2*gsize - 1;
+
+                let ch = if firstrow && firstcolumn {
+                    nwcorner
+                } else if firstrow && lastcolumn {
+                    necorner
+                } else if lastrow && firstcolumn {
+                    swcorner
+                } else if lastrow && lastcolumn {
+                    secorner
+                } else if firstrow || lastrow {
+                    horizwall
+                } else if firstcolumn || lastcolumn {
+                    vertwall
+                } else {
+                    0
+                };
+
+                self.print_cp437(assets, frame, Glyph { pos: (x, y), ch, fg, bg });
+            }
         }
 
         // if x < 1 || x > map.width-2 || y < 1 || y > map.height-2 as i32 { return 35; }
