@@ -51,7 +51,7 @@ label
 
 use crate::{colors::{self, Scale}, map, World, WIDTH, assets::cp437_converter::to_cp437};
 
-use super::Glyph;
+use super::{Glyph, GLYPH_SIZE};
 
 #[derive(Debug)]
 pub enum ConsoleMode {
@@ -104,14 +104,14 @@ impl Console {
                     &world.assets,
                     frame,
                     "Hello World",
-                    (self.pos.0 + 8, self.pos.1 + 8),
+                    (self.pos.0 + GLYPH_SIZE, self.pos.1 + GLYPH_SIZE),
                     // (self.pos.0 + self.size.0 / 2 - 11/2, self.pos.1 + self.size.1 / 2 - 4),
                 );
             }
             ConsoleMode::WorldMap => {
                 let zoom = self.zoom; // each tile takes up zoom x zoom pixels
 
-                if zoom < 8 {
+                if zoom < GLYPH_SIZE {
                     for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
                         let xscreen = i % WIDTH;
                         let yscreen = i / WIDTH;
@@ -171,7 +171,7 @@ impl Console {
                     &world.assets,
                     frame,
                     (self.pos.0, self.pos.1),
-                    (self.size.0 - 8, self.size.1 - 8),
+                    (self.size.0, self.size.1),
                     colors::COLOR_WHITE,
                     colors::COLOR_CLEAR
                 );

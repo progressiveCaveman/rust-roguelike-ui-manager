@@ -15,6 +15,8 @@ pub mod console;
 
 const MAX_ZOOM: usize = 8;
 
+const GLYPH_SIZE: usize = 8;
+
 pub enum MenuState {
     None,
     MainMenu { selection: usize },
@@ -47,13 +49,12 @@ impl Screen {
     }
 
     pub fn setup_consoles(&mut self) {
-        let gsize = 8; // todo make this not magical
 
         // log console
         let x = 0;
         let y = 0;
         let w = self.size.0;
-        let h = 10 * gsize;
+        let h = 10 * GLYPH_SIZE;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::Log));
 
         // main console
@@ -64,8 +65,8 @@ impl Screen {
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
 
         // menu console
-        let w = 200;
-        let h = 104;
+        let w = GLYPH_SIZE * 13;
+        let h = GLYPH_SIZE * 3;
         let x = self.size.0/2 - w/2;
         let y = self.size.1/2 - h/2;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::MainMenu));
@@ -122,7 +123,7 @@ impl Screen {
 
         for (idx, ch) in chars.iter().enumerate() {
             self.print_cp437(assets, frame, Glyph { 
-                pos: (pos.0 + idx * 8, pos.1),
+                pos: (pos.0 + idx * GLYPH_SIZE, pos.1),
                 ch: *ch, 
                 fg: colors::COLOR_WHITE, 
                 bg: colors::COLOR_CLEAR 
@@ -147,16 +148,14 @@ impl Screen {
         let secorner = 188;
         let swcorner = 200;
 
-        let gsize = 8;
+        let gsize = GLYPH_SIZE;
 
         for x in (pos.0 .. pos.0 + size.0 - gsize).step_by(gsize) {
             for y in (pos.1 .. pos.1 + size.1 - gsize).step_by(gsize) {
-                let mut ch = 0; // blank char
-
                 let firstcolumn = x < pos.0 + gsize;
-                let lastcolumn = x > pos.0 + size.0 - 2*gsize - 1;
+                let lastcolumn = x > pos.0 + size.0 - 2*gsize;
                 let firstrow = y < pos.1 + gsize;
-                let lastrow = y > pos.1 + size.1 - 2*gsize - 1;
+                let lastrow = y > pos.1 + size.1 - 2*gsize;
 
                 let ch = if firstrow && firstcolumn {
                     nwcorner
