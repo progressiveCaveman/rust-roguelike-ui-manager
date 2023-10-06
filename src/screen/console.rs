@@ -87,94 +87,15 @@ impl Console {
     }
 
     pub fn render(&self, frame: &mut [u8], world: &World) {
-        let map = &world.map;
-        let screen = &world.screen;
-
-        match &self.mode {
+        match self.mode {
             ConsoleMode::MainMenu => {
-                screen.draw_box(
-                    &world.assets,
-                    frame,
-                    self.pos,
-                    self.size,
-                    colors::COLOR_WHITE,
-                    colors::COLOR_BLACK_SEMI_TRANS
-                );
-                screen.print_string(
-                    &world.assets,
-                    frame,
-                    "Hello World",
-                    (self.pos.0 + GLYPH_SIZE, self.pos.1 + GLYPH_SIZE),
-                    // (self.pos.0 + self.size.0 / 2 - 11/2, self.pos.1 + self.size.1 / 2 - 4),
-                );
+                self.render_main_menu(frame, world);
             }
             ConsoleMode::WorldMap => {
-                let zoom = self.zoom; // each tile takes up zoom x zoom pixels
-
-                if zoom < GLYPH_SIZE {
-                    for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                        let xscreen = i % WIDTH;
-                        let yscreen = i / WIDTH;
-    
-                        let xrange = self.pos.0..self.pos.0 + self.size.0;
-                        let yrange = self.pos.1..self.pos.1 + self.size.1;
-    
-                        if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
-                            let xmap = self.map_pos.0 + (xscreen - self.pos.0) / zoom;
-                            let ymap = self.map_pos.1 + (yscreen - self.pos.1) / zoom;
-
-                            if map.in_bounds((xmap, ymap)) { 
-
-                                let rgba = match map.get_tile((xmap, ymap)) {
-                                    map::TileType::Water => colors::COLOR_DARK_BLUE,
-                                    map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                                    map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                                    map::TileType::Stone => colors::COLOR_GREY,
-                                };
-        
-                                pixel.copy_from_slice(&rgba);
-                            }
-                        }
-                    }
-                } else {
-                    let widthchars = self.size.0 / zoom;
-                    let heightchars = self.size.1 / zoom;
-    
-                    for x in 0 .. widthchars {
-                        for y in 0 .. heightchars {
-                            let pos = (x + self.map_pos.0, y + self.map_pos.1);
-                            // let idx = map.point_idx(point);
-                            if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(pos){
-                                let rgba = match map.get_tile(pos) {
-                                    map::TileType::Water => colors::COLOR_DARK_BLUE,
-                                    map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                                    map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                                    map::TileType::Stone => colors::COLOR_GREY,
-                                };
-                                screen.print_cp437(
-                                    &world.assets,
-                                    frame,
-                                    Glyph {
-                                        pos: (self.pos.0 + x * zoom, self.pos.1 + y * zoom),
-                                        ch: to_cp437(map.get_glyph(pos)),
-                                        fg: rgba,
-                                        bg: rgba.scale(0.5),
-                                    }
-                                );
-                            }
-                        }
-                    }
-                }
+                self.render_map(frame, world);
             }
             ConsoleMode::Log => {
-                screen.draw_box(
-                    &world.assets,
-                    frame,
-                    (self.pos.0, self.pos.1),
-                    (self.size.0, self.size.1),
-                    colors::COLOR_WHITE,
-                    colors::COLOR_CLEAR
-                );
+                self.render_log(frame, world);
             }
         }
 
@@ -193,6 +114,100 @@ impl Console {
                 }
             }
         }
+    }
+
+    pub fn render_main_menu(&self, frame: &mut [u8], world: &World) {
+        let screen = &world.screen;
+        screen.draw_box(
+            &world.assets,
+            frame,
+            self.pos,
+            self.size,
+            colors::COLOR_WHITE,
+            colors::COLOR_BLACK_SEMI_TRANS
+        );
+        screen.print_string(
+            &world.assets,
+            frame,
+            "Hello World",
+            (self.pos.0 + GLYPH_SIZE, self.pos.1 + GLYPH_SIZE),
+            // (self.pos.0 + self.size.0 / 2 - 11/2, self.pos.1 + self.size.1 / 2 - 4),
+        );
+    }
+
+    pub fn render_map(&self, frame: &mut [u8], world: &World) {
+        let map = &world.map;
+        let screen = &world.screen;
+
+        let zoom = self.zoom; // each tile takes up zoom x zoom pixels
+
+        if zoom < GLYPH_SIZE {
+            for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+                let xscreen = i % WIDTH;
+                let yscreen = i / WIDTH;
+
+                let xrange = self.pos.0..self.pos.0 + self.size.0;
+                let yrange = self.pos.1..self.pos.1 + self.size.1;
+
+                if xrange.contains(&xscreen) && yrange.contains(&yscreen) {
+                    let xmap = self.map_pos.0 + (xscreen - self.pos.0) / zoom;
+                    let ymap = self.map_pos.1 + (yscreen - self.pos.1) / zoom;
+
+                    if map.in_bounds((xmap, ymap)) { 
+
+                        let rgba = match map.get_tile((xmap, ymap)) {
+                            map::TileType::Water => colors::COLOR_DARK_BLUE,
+                            map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
+                            map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
+                            map::TileType::Stone => colors::COLOR_GREY,
+                        };
+
+                        pixel.copy_from_slice(&rgba);
+                    }
+                }
+            }
+        } else {
+            let widthchars = self.size.0 / zoom;
+            let heightchars = self.size.1 / zoom;
+
+            for x in 0 .. widthchars {
+                for y in 0 .. heightchars {
+                    let pos = (x + self.map_pos.0, y + self.map_pos.1);
+                    // let idx = map.point_idx(point);
+                    if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(pos){
+                        let rgba = match map.get_tile(pos) {
+                            map::TileType::Water => colors::COLOR_DARK_BLUE,
+                            map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
+                            map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
+                            map::TileType::Stone => colors::COLOR_GREY,
+                        };
+                        screen.print_cp437(
+                            &world.assets,
+                            frame,
+                            Glyph {
+                                pos: (self.pos.0 + x * zoom, self.pos.1 + y * zoom),
+                                ch: to_cp437(map.get_glyph(pos)),
+                                fg: rgba,
+                                bg: rgba.scale(0.5),
+                            }
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn render_log(&self, frame: &mut [u8], world: &World) {
+        let screen = &world.screen;
+
+        screen.draw_box(
+            &world.assets,
+            frame,
+            (self.pos.0, self.pos.1),
+            (self.size.0, self.size.1),
+            colors::COLOR_WHITE,
+            colors::COLOR_CLEAR
+        );
     }
 
     pub fn in_bounds(&self, pos: (usize, usize)) -> bool {
