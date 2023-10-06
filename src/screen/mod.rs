@@ -150,12 +150,12 @@ impl Screen {
 
         let gsize = GLYPH_SIZE;
 
-        for x in (pos.0 .. pos.0 + size.0 - gsize).step_by(gsize) {
-            for y in (pos.1 .. pos.1 + size.1 - gsize).step_by(gsize) {
+        for x in (pos.0 .. pos.0 + size.0).step_by(gsize) {
+            for y in (pos.1 .. pos.1 + size.1).step_by(gsize) {
                 let firstcolumn = x < pos.0 + gsize;
-                let lastcolumn = x > pos.0 + size.0 - 2*gsize;
+                let lastcolumn = x >= pos.0 + size.0 - gsize;
                 let firstrow = y < pos.1 + gsize;
-                let lastrow = y > pos.1 + size.1 - 2*gsize;
+                let lastrow = y >= pos.1 + size.1 - gsize;
 
                 let ch = if firstrow && firstcolumn {
                     nwcorner
