@@ -14,8 +14,8 @@ use self::console::{Console, ConsoleMode};
 pub mod console;
 
 const MAX_ZOOM: usize = 8;
-
 const GLYPH_SIZE: usize = 8;
+const DEBUG_OUTLINES: bool = true;
 
 pub enum MenuState {
     None,
@@ -53,15 +53,15 @@ impl Screen {
         // log console
         let x = 0;
         let y = 0;
-        let w = self.size.0;
-        let h = 10 * GLYPH_SIZE;
+        let w = self.size.0 - 1;
+        let h = 10 * GLYPH_SIZE - 1;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::Log));
 
         // main console
         let x = 0;
         let y = h;
         let w = w;
-        let h = self.size.1 - h;
+        let h = self.size.1 - h - 1;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
 
         // menu console

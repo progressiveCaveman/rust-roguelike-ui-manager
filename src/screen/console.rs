@@ -51,7 +51,7 @@ label
 
 use crate::{colors::{self, Scale}, map, World, WIDTH, assets::cp437_converter::to_cp437};
 
-use super::{Glyph, GLYPH_SIZE};
+use super::{Glyph, GLYPH_SIZE, DEBUG_OUTLINES};
 
 #[derive(Debug)]
 pub enum ConsoleMode {
@@ -177,5 +177,28 @@ impl Console {
                 );
             }
         }
+
+        if DEBUG_OUTLINES {
+            for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+                let xscreen = i % WIDTH;
+                let yscreen = i / WIDTH;
+
+                if self.in_bounds((xscreen, yscreen)) &&
+                    (xscreen == self.pos.0 || 
+                    xscreen == self.pos.0 + self.size.0 ||
+                    yscreen == self.pos.1 ||
+                    yscreen == self.pos.1 + self.size.1 )
+                {
+                    pixel.copy_from_slice(&colors::COLOR_PURPLE);               
+                }
+            }
+        }
+    }
+
+    pub fn in_bounds(&self, pos: (usize, usize)) -> bool {
+        return pos.0 >= self.pos.0 && 
+            pos.0 <= self.pos.0 + self.size.0 && 
+            pos.1 >= self.pos.1 &&
+            pos.1 <= self.pos.1 + self.size.1
     }
 }
