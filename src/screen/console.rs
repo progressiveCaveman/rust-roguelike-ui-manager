@@ -123,8 +123,8 @@ impl Console {
             frame,
             self.pos,
             self.size,
-            colors::COLOR_WHITE,
-            colors::COLOR_BLACK_SEMI_TRANS
+            colors::COLOR_UI_1,
+            colors::COLOR_BLACK_SEMI_TRANS // todo transparancy doesn't work
         );
         screen.print_string(
             &world.assets,
@@ -132,6 +132,7 @@ impl Console {
             "Hello World",
             (self.pos.0 + GLYPH_SIZE, self.pos.1 + GLYPH_SIZE),
             // (self.pos.0 + self.size.0 / 2 - 11/2, self.pos.1 + self.size.1 / 2 - 4),
+            colors::COLOR_UI_2
         );
     }
 
@@ -156,10 +157,10 @@ impl Console {
                     if map.in_bounds((xmap, ymap)) { 
 
                         let rgba = match map.get_tile((xmap, ymap)) {
-                            map::TileType::Water => colors::COLOR_DARK_BLUE,
-                            map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                            map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                            map::TileType::Stone => colors::COLOR_GREY,
+                            map::TileType::Water => colors::COLOR_WATER,
+                            map::TileType::Sand => colors::COLOR_SAND,
+                            map::TileType::Dirt => colors::COLOR_DIRT,
+                            map::TileType::Stone => colors::COLOR_STONE,
                         };
 
                         pixel.copy_from_slice(&rgba);
@@ -176,10 +177,10 @@ impl Console {
                     // let idx = map.point_idx(point);
                     if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(pos){
                         let rgba = match map.get_tile(pos) {
-                            map::TileType::Water => colors::COLOR_DARK_BLUE,
-                            map::TileType::Sand => colors::COLOR_DESATURATED_YELLOW,
-                            map::TileType::Dirt => colors::COLOR_DARKER_GREEN,
-                            map::TileType::Stone => colors::COLOR_GREY,
+                            map::TileType::Water => colors::COLOR_WATER,
+                            map::TileType::Sand => colors::COLOR_SAND,
+                            map::TileType::Dirt => colors::COLOR_DIRT,
+                            map::TileType::Stone => colors::COLOR_STONE,
                         };
                         screen.print_cp437(
                             &world.assets,
@@ -205,9 +206,28 @@ impl Console {
             frame,
             (self.pos.0, self.pos.1),
             (self.size.0, self.size.1),
-            colors::COLOR_WHITE,
+            colors::COLOR_UI_1,
             colors::COLOR_CLEAR
         );
+
+        let mut y = 1;
+        for m in world.game_log.iter().rev() {
+            for ms in m.chars().collect::<Vec<_>>().chunks(self.size.0 / GLYPH_SIZE - 2) {
+                if y * GLYPH_SIZE < self.size.1 - GLYPH_SIZE {
+                    let s: String = ms.into_iter().collect();
+                    screen.print_string(
+                        &world.assets,
+                        frame,
+                        &s,
+                        (self.pos.0 + GLYPH_SIZE, self.pos.1 + y * GLYPH_SIZE),
+                        colors::COLOR_UI_2
+                    );
+                    y += 1;
+                } else {
+                    return; // todo this will be a bug if more is added to this function
+                }
+            }
+        }
     }
 
     pub fn in_bounds(&self, pos: (usize, usize)) -> bool {

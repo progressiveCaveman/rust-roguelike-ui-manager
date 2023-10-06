@@ -34,6 +34,7 @@ pub struct World {
     pub assets: Assets,
     pub tick: i32,
     pub image: Image,
+    pub game_log: Vec<String>
 }
 
 impl World {
@@ -44,6 +45,7 @@ impl World {
             assets: Assets::new(),
             tick: 0,
             image: (Vec::new(), (0, 0)),
+            game_log: Vec::new(),
         }
     }
 
@@ -51,6 +53,7 @@ impl World {
     fn update(&mut self) {
         self.tick += 1;
         if self.tick % 100 == 0 {
+            self.game_log.push(format!("Test {}", self.tick / 100));
             // let mut rng = RandomNumberGenerator::new();
 
             // let x = rng.roll_dice(1, self.map.size.0);
@@ -101,6 +104,7 @@ fn main() -> Result<(), Error> {
     let mut world = World::new();
     basic_fill(&mut world.map);
     world.screen.setup_consoles();
+    world.game_log.push("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string());
 
     // Generate a texture
     // world.image = worldgen::world::basic();

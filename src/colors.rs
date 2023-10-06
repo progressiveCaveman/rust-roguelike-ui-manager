@@ -208,3 +208,10 @@ pub const COLOR_GOLD: Color = [229, 191, 0, 255];
 pub const COLOR_SILVER: Color = [203, 203, 203, 255];
 pub const COLOR_CELADON: Color = [172, 255, 175, 255];
 pub const COLOR_PEACH: Color = [255, 159, 127, 255];
+
+pub const COLOR_UI_1: Color = COLOR_GREEN;
+pub const COLOR_UI_2: Color = COLOR_LIGHT_PURPLE;
+pub const COLOR_WATER: Color = COLOR_DARK_BLUE;
+pub const COLOR_SAND: Color = COLOR_DESATURATED_YELLOW;
+pub const COLOR_DIRT: Color = COLOR_DARKER_GREEN;
+pub const COLOR_STONE: Color = COLOR_GREY;

@@ -15,7 +15,7 @@ pub mod console;
 
 const MAX_ZOOM: usize = 8;
 const GLYPH_SIZE: usize = 8;
-const DEBUG_OUTLINES: bool = true;
+const DEBUG_OUTLINES: bool = false;
 
 pub enum MenuState {
     None,
@@ -117,7 +117,7 @@ impl Screen {
         Screen::blit_glyph(frame, assets, glyph.pos, glyph);
     }
 
-    pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: (usize, usize)) {
+    pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: (usize, usize), color: Color) {
         // let str = "Hello world!";
         let chars = string_to_cp437(str);
 
@@ -125,7 +125,7 @@ impl Screen {
             self.print_cp437(assets, frame, Glyph { 
                 pos: (pos.0 + idx * GLYPH_SIZE, pos.1),
                 ch: *ch, 
-                fg: colors::COLOR_WHITE, 
+                fg: color, 
                 bg: colors::COLOR_CLEAR 
             });
             // let sprite = &assets.cp437[*ch as usize];
