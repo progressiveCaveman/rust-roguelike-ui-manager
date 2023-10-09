@@ -3,6 +3,10 @@ use map::Map;
 pub mod map;
 pub mod worldgen;
 
+/*
+This is where the main game engine stuff goes. Basically the ECS and whatever else makes sense
+*/
+
 pub struct Engine {
     // pub world: World,
     pub map: Map,

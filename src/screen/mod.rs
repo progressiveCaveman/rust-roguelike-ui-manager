@@ -6,7 +6,7 @@ use crate::{
         sprites::Drawable,
         Assets,
     },
-    Image, Game, HEIGHT, WIDTH, colors::{Color, self},
+    Game, HEIGHT, WIDTH, colors::{Color, self}, Image,
 };
 
 use self::console::{Console, ConsoleMode};

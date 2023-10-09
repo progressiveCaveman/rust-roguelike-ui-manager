@@ -20,8 +20,6 @@ pub mod screen;
 const SCALE: usize = 2;
 const WIDTH: usize = 640 * SCALE;
 const HEIGHT: usize = 480 * SCALE;
-// const WIDTH: usize = 320;
-// const HEIGHT: usize = 320;
 
 type Image = (Vec<[u8; 4]>, (usize, usize));
 
@@ -30,7 +28,6 @@ pub struct Game {
     pub screen: Screen,
     pub assets: Assets,
     pub tick: i32,
-    pub image: Image,
     pub game_log: Vec<String>
 }
 
@@ -41,7 +38,6 @@ impl Game {
             screen: Screen::new((WIDTH, HEIGHT)),
             assets: Assets::new(),
             tick: 0,
-            image: (Vec::new(), (0, 0)),
             game_log: Vec::new(),
         }
     }
