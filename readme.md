@@ -15,3 +15,5 @@ Controls:
 - Arrow keys to move around map and menus, enter to select
 - Shift+arrows to move around map by 10 steps
 - r to refresh worldgen
+
+![Example GIF](https://imgur.com/a/IFWbGER)
