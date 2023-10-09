@@ -1,11 +1,14 @@
 use winit::event::VirtualKeyCode;
 use winit_input_helper::WinitInputHelper;
 
-use crate::{World, worldgen::basic_fill};
+use crate::{World, worldgen::basic_fill, screen::UIState};
 
 pub enum Action {
     None,
     Exit,
+    // Up, Down, Left, Right,
+    // Select,
+    // ZoomIn, ZoomOut
 }
 
 pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
@@ -13,16 +16,6 @@ pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
     if input.key_pressed(VirtualKeyCode::Escape) {
         return Action::Exit;
     }
-
-    // V
-    // if input.key_pressed(VirtualKeyCode::V) {
-    //     world.screen.consoles[1].mode = match world.screen.consoles[1].mode {
-    //         ConsoleMode::MainMenu => ConsoleMode::WorldMap,
-    //         ConsoleMode::LocalMap => ConsoleMode::WorldMap,
-    //         ConsoleMode::WorldMap => ConsoleMode::LocalMap,
-    //         ConsoleMode::Log => ConsoleMode::Log,
-    //     }
-    // }
 
     // + : zoom in
     if input.key_pressed_os(VirtualKeyCode::Equals) {
@@ -45,24 +38,69 @@ pub fn handle_input(input: &WinitInputHelper, world: &mut World) -> Action {
         1
     };
 
-    // Up : pan map
+    // Up
     if input.key_pressed_os(VirtualKeyCode::Up) {
-        world.screen.pan_map((0, -1 * movemod));
+        match world.screen.ui_state {
+            UIState::Game => {
+                world.screen.pan_map((0, -1 * movemod));
+            },
+            UIState::MainMenu { selection } => {
+                world.screen.ui_state = UIState::MainMenu { selection: selection - 1 };
+            },
+        }
     }
 
-    // Down : pan map
+    // Down
     if input.key_pressed_os(VirtualKeyCode::Down) {
-        world.screen.pan_map((0, 1 * movemod));
+
+        match world.screen.ui_state {
+            UIState::Game => {
+                world.screen.pan_map((0, 1 * movemod));
+            },
+            UIState::MainMenu { selection } => {
+                world.screen.ui_state = UIState::MainMenu { selection: selection + 1 };
+            },
+        }
     }
 
-    // Left : pan map
+    // Left
     if input.key_pressed_os(VirtualKeyCode::Left) {
-        world.screen.pan_map((-1 * movemod, 0));
+
+        match world.screen.ui_state {
+            UIState::Game => {
+                world.screen.pan_map((-1 * movemod, 0));
+            },
+            _ => {
+                
+            },
+        }
     }
 
-    // Right : pan map
+    // Right
     if input.key_pressed_os(VirtualKeyCode::Right) {
-        world.screen.pan_map((1 * movemod, 0));
+
+        match world.screen.ui_state {
+            UIState::Game => {
+                world.screen.pan_map((1 * movemod, 0));
+            },
+            _ => {
+                
+            },
+        }
+    }
+
+    // Enter
+    if input.key_pressed_os(VirtualKeyCode::Return) {
+        match world.screen.ui_state {
+            UIState::MainMenu { selection } => {
+                if selection == 0 { //play game
+                    world.screen.ui_state = UIState::Game;
+                }else if selection == 1 { // exit
+                    return Action::Exit;
+                }
+            },
+            _ => {}
+        }
     }
 
     return Action::None;

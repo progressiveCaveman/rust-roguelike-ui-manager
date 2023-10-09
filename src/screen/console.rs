@@ -51,7 +51,7 @@ label
 
 use crate::{colors::{self, Scale}, map, World, WIDTH, assets::cp437_converter::to_cp437};
 
-use super::{Glyph, GLYPH_SIZE, DEBUG_OUTLINES};
+use super::{Glyph, GLYPH_SIZE, DEBUG_OUTLINES, UIState};
 
 #[derive(Debug)]
 pub enum ConsoleMode {
@@ -118,22 +118,50 @@ impl Console {
 
     pub fn render_main_menu(&self, frame: &mut [u8], world: &World) {
         let screen = &world.screen;
-        screen.draw_box(
-            &world.assets,
-            frame,
-            self.pos,
-            self.size,
-            colors::COLOR_UI_1,
-            colors::COLOR_BLACK_SEMI_TRANS // todo transparancy doesn't work
-        );
-        screen.print_string(
-            &world.assets,
-            frame,
-            "Hello World",
-            (self.pos.0 + GLYPH_SIZE, self.pos.1 + GLYPH_SIZE),
-            // (self.pos.0 + self.size.0 / 2 - 11/2, self.pos.1 + self.size.1 / 2 - 4),
-            colors::COLOR_UI_2
-        );
+
+        if let UIState::MainMenu{selection} = screen.ui_state {
+            screen.draw_box(
+                &world.assets,
+                frame,
+                self.pos,
+                self.size,
+                colors::COLOR_UI_1,
+                colors::COLOR_BLACK_SEMI_TRANS // todo transparancy doesn't work
+            );
+
+            let x = self.pos.0 + 3 * GLYPH_SIZE;
+            let mut y = self.pos.1 + 2 * GLYPH_SIZE;
+
+            screen.print_string(
+                &world.assets,
+                frame,
+                "Main Menu",
+                (x, y),
+                colors::COLOR_UI_2
+            );
+
+            y += 2 * GLYPH_SIZE;
+
+            screen.print_string(
+                &world.assets,
+                frame,
+                "Play Game",
+                (x, y),
+                // colors::COLOR_UI_2
+                if selection == 0 { colors::COLOR_UI_3 } else { colors::COLOR_UI_2 }
+            );
+
+            y += GLYPH_SIZE;
+
+            screen.print_string(
+                &world.assets,
+                frame,
+                "Quit",
+                (x, y),
+                // colors::COLOR_UI_2
+                if selection == 1 { colors::COLOR_UI_3 } else { colors::COLOR_UI_2 }
+            );
+        }
     }
 
     pub fn render_map(&self, frame: &mut [u8], world: &World) {

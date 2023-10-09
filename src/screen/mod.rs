@@ -17,8 +17,8 @@ const MAX_ZOOM: usize = 8;
 const GLYPH_SIZE: usize = 8;
 const DEBUG_OUTLINES: bool = false;
 
-pub enum MenuState {
-    None,
+pub enum UIState {
+    Game,
     MainMenu { selection: usize },
 }
 
@@ -26,7 +26,7 @@ pub struct Screen {
     pub size: (usize, usize),
     pub input_blocking: bool,
     consoles: Vec<Console>,
-    pub menu_state: MenuState,
+    pub ui_state: UIState,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -44,7 +44,7 @@ impl Screen {
             size,
             input_blocking: false,
             consoles: Vec::new(),
-            menu_state: MenuState::None,
+            ui_state: UIState::MainMenu { selection: 0 },
         }
     }
 
@@ -65,8 +65,8 @@ impl Screen {
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::WorldMap));
 
         // menu console
-        let w = GLYPH_SIZE * 13;
-        let h = GLYPH_SIZE * 3;
+        let w = GLYPH_SIZE * 30;
+        let h = GLYPH_SIZE * 20;
         let x = self.size.0/2 - w/2;
         let y = self.size.1/2 - h/2;
         self.consoles.push(Console::new((w, h), (x, y), ConsoleMode::MainMenu));
@@ -118,7 +118,6 @@ impl Screen {
     }
 
     pub fn print_string(&self, assets: &Assets, frame: &mut [u8], str: &str, pos: (usize, usize), color: Color) {
-        // let str = "Hello world!";
         let chars = string_to_cp437(str);
 
         for (idx, ch) in chars.iter().enumerate() {
