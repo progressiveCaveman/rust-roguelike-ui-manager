@@ -11,7 +11,7 @@ A few goals:
 - ~~Enough abstraction for menus to keep new code clean~~ (This isn't done and I'm not sure how to do it without over-abstraction, so it's incomplete for now. I'm open to suggestions/PRs!)
 
 Controls:
-+/- to zoom in and out
-Arrow keys to move around map and menus, enter to select
-Shift+arrows to move around map by 10 steps
-r to refresh worldgen
+- +/- to zoom in and out
+- Arrow keys to move around map and menus, enter to select
+- Shift+arrows to move around map by 10 steps
+- r to refresh worldgen
