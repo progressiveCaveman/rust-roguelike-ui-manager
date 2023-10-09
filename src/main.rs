@@ -1,24 +1,21 @@
 use assets::Assets;
+use engine::{worldgen, Engine};
 use error_iter::ErrorIter as _;
 use input_handler::{handle_input, Action};
 use log::error;
-use map::Map;
 use pixels::{Error, Pixels, SurfaceTexture};
 
 use screen::Screen;
 use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode};
+use winit::event::Event;
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
-use worldgen::basic_fill;
 
 pub mod assets;
 pub mod colors;
 pub mod input_handler;
-pub mod map;
 pub mod screen;
-pub mod worldgen;
 
 const SCALE: usize = 2;
 const WIDTH: usize = 640 * SCALE;
@@ -28,8 +25,8 @@ const HEIGHT: usize = 480 * SCALE;
 
 type Image = (Vec<[u8; 4]>, (usize, usize));
 
-pub struct World {
-    pub map: Map,
+pub struct Game {
+    pub engine: Engine,
     pub screen: Screen,
     pub assets: Assets,
     pub tick: i32,
@@ -37,10 +34,10 @@ pub struct World {
     pub game_log: Vec<String>
 }
 
-impl World {
+impl Game {
     fn new() -> Self {
         Self {
-            map: Map::new(map::TileType::Water, (WIDTH, HEIGHT)),
+            engine: Engine::new((WIDTH, HEIGHT)),
             screen: Screen::new((WIDTH, HEIGHT)),
             assets: Assets::new(),
             tick: 0,
@@ -101,10 +98,10 @@ fn main() -> Result<(), Error> {
     };
 
     // Generate a world map
-    let mut world = World::new();
-    basic_fill(&mut world.map);
-    world.screen.setup_consoles();
-    world.game_log.push("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string());
+    let mut game = Game::new();
+    worldgen::basic_fill(&mut game.engine.map);
+    game.screen.setup_consoles();
+    game.game_log.push("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string());
 
     // Generate a texture
     // world.image = worldgen::world::basic();
@@ -113,7 +110,7 @@ fn main() -> Result<(), Error> {
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.frame_mut());
+            game.draw(pixels.frame_mut());
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;
@@ -124,12 +121,12 @@ fn main() -> Result<(), Error> {
         // Handle input events
         if input.update(&event) {
             // Close events
-            if input.close_requested() || input.key_pressed(VirtualKeyCode::Escape) {
+            if input.close_requested() {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
 
-            match handle_input(&input, &mut world) {
+            match handle_input(&input, &mut game) {
                 Action::None => {}
                 Action::Exit => {
                     *control_flow = ControlFlow::Exit;
@@ -147,7 +144,7 @@ fn main() -> Result<(), Error> {
             }
 
             // Update internal state and request a redraw
-            world.update();
+            game.update();
             window.request_redraw();
         }
     });

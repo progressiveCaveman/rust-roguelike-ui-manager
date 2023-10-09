@@ -1,4 +1,4 @@
-use std::vec;
+use std::{vec, convert::TryInto};
 
 use rand::Rng;
 

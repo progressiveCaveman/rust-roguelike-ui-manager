@@ -49,7 +49,9 @@ label
 
 */
 
-use crate::{colors::{self, Scale}, map, World, WIDTH, assets::cp437_converter::to_cp437};
+use engine::map::TileType;
+
+use crate::{colors::{self, Scale}, Game, WIDTH, assets::cp437_converter::to_cp437};
 
 use super::{Glyph, GLYPH_SIZE, DEBUG_OUTLINES, UIState};
 
@@ -86,16 +88,16 @@ impl Console {
         }
     }
 
-    pub fn render(&self, frame: &mut [u8], world: &World) {
+    pub fn render(&self, frame: &mut [u8], game: &Game) {
         match self.mode {
             ConsoleMode::MainMenu => {
-                self.render_main_menu(frame, world);
+                self.render_main_menu(frame, game);
             }
             ConsoleMode::WorldMap => {
-                self.render_map(frame, world);
+                self.render_map(frame, game);
             }
             ConsoleMode::Log => {
-                self.render_log(frame, world);
+                self.render_log(frame, game);
             }
         }
 
@@ -116,12 +118,12 @@ impl Console {
         }
     }
 
-    pub fn render_main_menu(&self, frame: &mut [u8], world: &World) {
-        let screen = &world.screen;
+    pub fn render_main_menu(&self, frame: &mut [u8], game: &Game) {
+        let screen = &game.screen;
 
         if let UIState::MainMenu{selection} = screen.ui_state {
             screen.draw_box(
-                &world.assets,
+                &game.assets,
                 frame,
                 self.pos,
                 self.size,
@@ -133,7 +135,7 @@ impl Console {
             let mut y = self.pos.1 + 2 * GLYPH_SIZE;
 
             screen.print_string(
-                &world.assets,
+                &game.assets,
                 frame,
                 "Main Menu",
                 (x, y),
@@ -143,7 +145,7 @@ impl Console {
             y += 2 * GLYPH_SIZE;
 
             screen.print_string(
-                &world.assets,
+                &game.assets,
                 frame,
                 "Play Game",
                 (x, y),
@@ -154,7 +156,7 @@ impl Console {
             y += GLYPH_SIZE;
 
             screen.print_string(
-                &world.assets,
+                &game.assets,
                 frame,
                 "Quit",
                 (x, y),
@@ -164,9 +166,9 @@ impl Console {
         }
     }
 
-    pub fn render_map(&self, frame: &mut [u8], world: &World) {
-        let map = &world.map;
-        let screen = &world.screen;
+    pub fn render_map(&self, frame: &mut [u8], game: &Game) {
+        let map = &game.engine.map;
+        let screen = &game.screen;
 
         let zoom = self.zoom; // each tile takes up zoom x zoom pixels
 
@@ -185,10 +187,10 @@ impl Console {
                     if map.in_bounds((xmap, ymap)) { 
 
                         let rgba = match map.get_tile((xmap, ymap)) {
-                            map::TileType::Water => colors::COLOR_WATER,
-                            map::TileType::Sand => colors::COLOR_SAND,
-                            map::TileType::Dirt => colors::COLOR_DIRT,
-                            map::TileType::Stone => colors::COLOR_STONE,
+                            TileType::Water => colors::COLOR_WATER,
+                            TileType::Sand => colors::COLOR_SAND,
+                            TileType::Dirt => colors::COLOR_DIRT,
+                            TileType::Stone => colors::COLOR_STONE,
                         };
 
                         pixel.copy_from_slice(&rgba);
@@ -205,13 +207,13 @@ impl Console {
                     // let idx = map.point_idx(point);
                     if x < self.pos.0 + self.size.0 + zoom && y < self.pos.1 + self.size.1 + zoom && map.in_bounds(pos){
                         let rgba = match map.get_tile(pos) {
-                            map::TileType::Water => colors::COLOR_WATER,
-                            map::TileType::Sand => colors::COLOR_SAND,
-                            map::TileType::Dirt => colors::COLOR_DIRT,
-                            map::TileType::Stone => colors::COLOR_STONE,
+                            TileType::Water => colors::COLOR_WATER,
+                            TileType::Sand => colors::COLOR_SAND,
+                            TileType::Dirt => colors::COLOR_DIRT,
+                            TileType::Stone => colors::COLOR_STONE,
                         };
                         screen.print_cp437(
-                            &world.assets,
+                            &game.assets,
                             frame,
                             Glyph {
                                 pos: (self.pos.0 + x * zoom, self.pos.1 + y * zoom),
@@ -226,11 +228,11 @@ impl Console {
         }
     }
 
-    pub fn render_log(&self, frame: &mut [u8], world: &World) {
-        let screen = &world.screen;
+    pub fn render_log(&self, frame: &mut [u8], game: &Game) {
+        let screen = &game.screen;
 
         screen.draw_box(
-            &world.assets,
+            &game.assets,
             frame,
             (self.pos.0, self.pos.1),
             (self.size.0, self.size.1),
@@ -239,12 +241,12 @@ impl Console {
         );
 
         let mut y = 1;
-        for m in world.game_log.iter().rev() {
+        for m in game.game_log.iter().rev() {
             for ms in m.chars().collect::<Vec<_>>().chunks(self.size.0 / GLYPH_SIZE - 2) {
                 if y * GLYPH_SIZE < self.size.1 - GLYPH_SIZE {
                     let s: String = ms.into_iter().collect();
                     screen.print_string(
-                        &world.assets,
+                        &game.assets,
                         frame,
                         &s,
                         (self.pos.0 + GLYPH_SIZE, self.pos.1 + y * GLYPH_SIZE),

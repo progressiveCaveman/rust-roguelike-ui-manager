@@ -7,5 +7,11 @@ Uses winit + pixels for window + rendering. Intended to replace [bracket-termina
 A few goals:
 - General features you'd expect in a terminal emulator library such as Bracket-lib
 - Ability to zoom a game map from tile-based display to pixel-based display
-- Project skeleton usable for future development - Separate input handling, assets, and game engine
-- Enough abstraction for menus to keep new code clean
+- Project skeleton usable for future development - Separate input handling, assets, etc
+- ~~Enough abstraction for menus to keep new code clean~~ (This isn't done and I'm not sure how to do it without over-abstraction, so it's incomplete for now. I'm open to suggestions/PRs!)
+
+Controls:
++/- to zoom in and out
+Arrow keys to move around map and menus, enter to select
+Shift+arrows to move around map by 10 steps
+r to refresh worldgen

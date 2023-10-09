@@ -6,7 +6,7 @@ use crate::{
         sprites::Drawable,
         Assets,
     },
-    Image, World, HEIGHT, WIDTH, colors::{Color, self},
+    Image, Game, HEIGHT, WIDTH, colors::{Color, self},
 };
 
 use self::console::{Console, ConsoleMode};
@@ -38,7 +38,6 @@ pub struct Glyph {
 }
 
 impl Screen {
-    /// Create a new `World` instance that can draw a moving box.
     pub fn new(size: (usize, usize)) -> Self {
         Self {
             size,
@@ -104,10 +103,10 @@ impl Screen {
         };
     }
 
-    pub fn draw(&self, frame: &mut [u8], world: &World) {
+    pub fn draw(&self, frame: &mut [u8], game: &Game) {
         for c in self.consoles.iter() {
             if !c.hidden {
-                c.render(frame, world);
+                c.render(frame, game);
             }
         }
     }

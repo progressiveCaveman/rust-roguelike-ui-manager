@@ -14,10 +14,10 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn new(tile_type: TileType, size: (usize, usize)) -> Map {
+    pub fn new(size: (usize, usize)) -> Map {
         let count = (size.0 * size.1) as usize;
         Map {
-            tiles: vec![tile_type; count],
+            tiles: vec![TileType::Water; count],
             size, // influence_maps:vec![vec![0.0; count]; 2],// todo magic numbers
         }
     }
