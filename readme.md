@@ -16,4 +16,4 @@ Controls:
 - Shift+arrows to move around map by 10 steps
 - r to refresh worldgen
 
-![Example GIF](https://imgur.com/a/IFWbGER)
+[Example GIF](https://imgur.com/a/IFWbGER)
